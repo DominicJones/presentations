@@ -1,0 +1,394 @@
+% \documentclass{beamer}
+\documentclass[xcolor=dvipsnames]{beamer}
+%% \usefonttheme[onlymath]{serif}
+\usefonttheme{professionalfonts}
+%% \usecolortheme[named=Blue]{structure}
+\setbeamersize{text margin left=30mm, text margin right=30mm}
+\useoutertheme{infolines}
+%% \usetheme[height=7mm]{Rochester}
+\usetheme{Pittsburgh}
+\setbeamertemplate{items}[ball]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{default}
+\usepackage[english]{babel}
+\usepackage{geometry}
+%% \usepackage{fullpage}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{listings}
+\usepackage{pxfonts}
+%% \usepackage{color}
+%% \usepackage{graphicx}
+%% \usepackage{natbib}
+%% \usepackage{array}
+%% \usepackage{booktabs}
+%% \usepackage{tabu}
+%% \usepackage[utf8]{inputenc}
+%% \usepackage{fancyhdr}
+%% \usepackage{float}
+%% \usepackage{subfigure}
+%% \usepackage{titlesec}
+
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}[frame number]{}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{}
+
+\renewcommand{\chaptername}{}
+\renewcommand{\bibname}{References}
+\newcommand{\pluseq}{\:+\!\!=}
+\newcommand{\minuseq}{\:-\!\!=}
+\newcommand{\mrm}[1]{\mathrm{#1}}
+\newcommand{\bsym}[1]{\boldsymbol{#1}}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+
+\newcommand{\totalderiv}[2]{\frac{\mrm{d} #1}{\mrm{d} #2}}
+\newcommand{\partialderiv}[2]{\frac{\partial #1}{\partial #2}}
+
+\newcommand{\totalderivT}[2]{\totalderiv{#1}{#2}^{\mrm{T}}}
+\newcommand{\partialderivT}[2]{\partialderiv{#1}{#2}^{\mrm{T}}}
+
+
+\setcounter{MaxMatrixCols}{20}
+
+\def\CCT{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\tiny\bf ++}}}
+\def\CC{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\small\bf ++}}}
+
+
+\definecolor{lstgray}{gray}{0.93}
+\lstset{ %
+  escapechar=@,
+  language=C++,
+  basicstyle=\footnotesize\ttfamily,
+  %% basicstyle=\ttfamily,
+  %% keywordstyle=\color{blue}\ttfamily,
+  keywordstyle=\bfseries,
+  stringstyle=\color{red}\ttfamily,
+  commentstyle=\color{OliveGreen}\ttfamily,
+  morecomment=[l][\color{red}]{\#},
+  backgroundcolor=\color{lstgray},
+  %% keywordstyle=\color{red},
+  frame=f,
+  frameround=ffff,
+  tabsize=2,
+  breaklines=true,
+  breakatwhitespace=false,
+  showspaces=false,
+  showstringspaces=false,
+  xleftmargin=5pt,
+  xrightmargin=5pt,
+  morekeywords={in,out,ref,auto,inout,import,ushort,scope,exit,mixin,decltype,varid,sizeof}
+}
+
+\def\redcolor{\color{red}}
+\def\bluecolor{\color{blue}}
+\def\blackcolor{\color{black}}
+\def\graycolor{\color{gray}}
+\def\greencolor{\color{OliveGreen}}
+
+
+\def\sectionname{\translate{Section}}
+\def\insertsectionnumber{\arabic{section}}
+\setbeamertemplate{section page}
+{
+  \begin{centering}
+    \begin{beamercolorbox}[sep=4pt,center]{part title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \end{centering}
+}
+\def\sectionpage{\usebeamertemplate*{section page}}
+
+
+\AtBeginSection{\frame{\sectionpage}}
+
+\usepackage{caption}
+\captionsetup[figure]{labelformat=empty}
+
+
+\title{Aristotelian Proof}
+\subtitle{The Unmoved Mover}
+%% \author{\texorpdfstring{Author\newline\url{email@email.com}}{Dominic Jones}}
+\author{Dominic Jones}
+%% \author{Author\\{\tiny email@email.com}}
+%% \institute{\texttt{dominic.jones@gmx.co.uk}}
+%% \date{London, January 2018}
+
+
+\begin{document}
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}{}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\textwidth]{unmoved_mover}
+\end{figure}
+\end{frame}
+
+\section{At least some things change}
+
+\begin{frame}{From becoming cold or fat\ldots}
+\begin{figure}
+  \centering
+  \begin{columns}
+    \column{0.5\textwidth}
+    \centering
+    \caption {Qualitative change}
+    \includegraphics[width=0.99\textwidth]{tea}
+    \column{0.5\textwidth}
+    \centering
+    \caption {Quantitative change}
+    \includegraphics[width=0.99\textwidth]{cat}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+\begin{frame}{or to dropping and dying\ldots}
+\begin{figure}
+  \centering
+  \begin{columns}
+    \column{0.5\textwidth}
+    \centering
+    \caption {Change of location}
+    \includegraphics[width=0.99\textwidth]{leaf}
+    \column{0.5\textwidth}
+    \centering
+    \caption {Substantial change}
+    \includegraphics[width=0.99\textwidth]{fox}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+\begin{frame}{or going from ignorance to knowledge}
+\begin{figure}
+  \centering
+  \begin{columns}
+    \column{0.5\textwidth}
+    \centering
+    \caption {Change of mind}
+    \includegraphics[width=0.99\textwidth]{pills}
+    \column{0.5\textwidth}
+    \centering
+    \caption {Casting doubt}
+    \includegraphics[width=0.99\textwidth]{stairs}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{Change}
+  \begin{enumerate}
+  \item There is at least some change in something \vspace{5mm}
+  \item To undergo some change, the actual thing being changed must in some way be in potential the thing it becomes \vspace{5mm}
+  \item Things may change are at once actually something but also potentially something else \vspace{5mm}
+  \item A thing that changes cannot change exclusively by itself \vspace{5mm}
+  \end{enumerate}
+\end{frame}
+
+
+\section{A change needs a changer}
+
+
+\begin{frame}{}
+\begin{figure}
+  \centering
+  \begin{columns}
+    \column{0.5\textwidth}
+    \centering
+    \caption {This can be many things\ldots}
+    \includegraphics[width=0.99\textwidth]{marble}
+    \column{0.5\textwidth}
+    \centering
+    \caption {through an agent of change}
+    \includegraphics[width=0.99\textwidth]{david}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Agent}
+  \begin{enumerate}
+  \item Potential `David' cannot make itself, therefore an agent of change is required \vspace{5mm}
+  \item That agent must be actual to bring about the change, therefore what is actual is \emph{prior} to what is potential \vspace{5mm}
+    \item This kind of \emph{linear} change could go on forever\ldots \vspace{5mm}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{\ldots or could go back forever}
+\begin{figure}
+  \centering
+  \begin{columns}
+    %% \column{0.5\textwidth}
+    %% \centering
+    %% \caption {Can be many things...}
+    %% \includegraphics[width=0.99\textwidth]{marble}
+    \column{0.99\textwidth}
+    \centering
+    %% \caption {(but this is irrelevant)}
+    \includegraphics[width=0.99\textwidth]{big_bang}
+  \end{columns}
+\end{figure}
+  \begin{enumerate}
+  \item Changes in time could \emph{metaphysically} have no starting point (no first member) \vspace{5mm}
+  \item A linear series of changes is not \emph{at once} hierarchically dependent \vspace{5mm}
+  \end{enumerate}
+\end{frame}
+
+
+\section{`That's just way it is' - this is also change}
+
+
+\begin{frame}[fragile]{Hierarchy of the actual}
+  \begin{enumerate}
+  \item Things that change are described as having potency and act \vspace{5mm}
+  \item But something that can change, and is the way it is \emph{here and now}, is also the actualisation of a potential \vspace{5mm}
+    \item This kind of change is hierarchical: if there is no inherent power to be the way it is, this power must be derived
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{An instrument of real power}
+\begin{figure}
+  \centering
+  \begin{columns}
+    \column{0.5\textwidth}
+    \centering
+    \caption {Not possible!}
+    \includegraphics[width=0.99\textwidth]{levitation2}
+    \column{0.5\textwidth}
+    \centering
+    \caption {Everyday occurrence}
+    \includegraphics[width=0.99\textwidth]{levitation}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{First in line}
+  \begin{enumerate}
+  \item She cannot hold herself in the air by herself \vspace{5mm}
+  \item The power to do so is imparted through the great `Kellar', despite being \emph{merely} an instrument \vspace{5mm}
+  \item She is \emph{potentially} flat on the ground but for the \emph{act} of the intermediary \vspace{5mm}
+  \item But not `and so on forever': something \emph{actual} must terminate this imparted power \vspace{5mm}
+  \end{enumerate}
+\end{frame}
+
+
+\section{Something that changes must first exist}
+
+
+\begin{frame}{(But not everything can change)}
+\begin{figure}
+  \centering
+  \begin{columns}
+    \column{0.4\textwidth}
+    \centering
+    \caption {Object of thought (abstract)}
+    \includegraphics[width=0.99\textwidth]{number}
+    \column{0.6\textwidth}
+    \centering
+    \caption {Object of some people's thought}
+    \includegraphics[width=0.99\textwidth]{ufo}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{Hierarchy of being}
+  \begin{enumerate}
+  \item Change can happen only if the thing exists \vspace{5mm}
+  \item But what keeps the thing in existence \emph{here and now}? \vspace{5mm}
+  \item How something \emph{came to be} or how it might \emph{cease to exist} would not answer the question \vspace{5mm}
+  \end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Only `To Be' imparts being}
+\begin{figure}
+  \centering
+  \begin{columns}
+    %% \column{0.5\textwidth}
+    %% \centering
+    %% \caption {Can be many things...}
+    %% \includegraphics[width=0.99\textwidth]{marble}
+    \column{0.99\textwidth}
+    \centering
+    %% \caption {(but this is irrelevant)}
+    \includegraphics[width=0.99\textwidth]{to_be}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{\emph{The} Unactualised Actualiser}
+  \begin{enumerate}
+  \item The first cause of existence must have no potential for existence \vspace{5mm}
+  \item Pure actuality, then, could not have a cause of its own nor can it change \vspace{5mm}
+  \item Time is a measure of change - therefore not in time \vspace{5mm}
+  \item To be material entails being changeable - therefore not material \vspace{5mm}
+  \end{enumerate}
+\end{frame}
+
+
+\section{Intelligence}
+
+
+\begin{frame}{There's more to this}
+\begin{figure}
+  \centering
+  \begin{columns}
+    %% \column{0.5\textwidth}
+    %% \centering
+    %% \caption {Can be many things...}
+    %% \includegraphics[width=0.99\textwidth]{marble}
+    \column{0.99\textwidth}
+    \centering
+    %% \caption {(but this is irrelevant)}
+    \includegraphics[width=0.99\textwidth]{abstract}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{To know abstract concepts}
+  \begin{enumerate}
+  \item Intelligence entails at least knowing the \emph{form} of things, i.e. what things are essentially \vspace{5mm}
+  \item Whatever is in an effect, must in some way be in the totality of its cause \vspace{5mm}
+  \item The cause of a thing's existence must also be the cause of the form of its existence \vspace{5mm}
+  \end{enumerate}
+\end{frame}
+
+
+\section{Further reading}
+
+
+\begin{frame}{Edward Feser}
+\begin{figure}
+  \centering
+  \begin{columns}
+    \column{0.32\textwidth}
+    \centering
+    %% \caption {In}
+    \includegraphics[width=0.99\textwidth]{superstition}
+    \column{0.32\textwidth}
+    \centering
+    %% \caption {this}
+    \includegraphics[width=0.99\textwidth]{five_proofs}
+    \column{0.34\textwidth}
+    \centering
+    %% \caption {order}
+    \includegraphics[width=0.99\textwidth]{metaphysics}
+  \end{columns}
+\end{figure}
+\end{frame}
+
+
+\end{document}
+
+
+%% \begin{frame}{}
+%%   \centering
+%%   \emph{If} something which causes a change is undergoing a change itself, \emph{then} that change requires a changer of its own
+%% \end{frame}
