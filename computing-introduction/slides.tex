@@ -1,0 +1,350 @@
+% \documentclass{beamer}
+\documentclass[xcolor=dvipsnames]{beamer}
+%% \usecolortheme[named=Blue]{structure}
+\setbeamersize{text margin left=30mm, text margin right=30mm}
+\useoutertheme{infolines}
+\usetheme[height=7mm]{Rochester}
+\setbeamertemplate{items}[ball]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{default}
+\usepackage[english]{babel}
+\usepackage{geometry}
+%% \usepackage{fullpage}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{listings}
+%% \usepackage{color}
+%% \usepackage{graphicx}
+%% \usepackage{natbib}
+%% \usepackage{array}
+%% \usepackage{booktabs}
+%% \usepackage{tabu}
+%% \usepackage[utf8]{inputenc}
+%% \usepackage{fancyhdr}
+%% \usepackage{float}
+%% \usepackage{subfigure}
+%% \usepackage{titlesec}
+
+
+\definecolor{lstgray}{gray}{0.9}
+\lstset{ %
+  language=C++,
+  basicstyle=\footnotesize\ttfamily,
+  %% basicstyle=\ttfamily,
+  keywordstyle=\color{blue}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  commentstyle=\color{green}\ttfamily,
+  morecomment=[l][\color{magenta}]{\#},
+  backgroundcolor=\color{lstgray},
+  %% keywordstyle=\color{red},
+  frame=single,
+  frameround=tttt,
+  tabsize=2,
+  breaklines=true,
+  breakatwhitespace=false,
+  showspaces=false,
+  showstringspaces=false,
+  xleftmargin=20pt,
+  xrightmargin=20pt,
+  morekeywords={in,out,inout,import,ushort}
+}
+
+%% \AtBeginSection{\frame{\sectionpage}}
+
+
+\title{Computing}
+\subtitle{A difficult introduction}
+\author{Dr D P Jones}
+\institute{The Cedars School}
+\date{October 2013}
+
+
+\begin{document}
+\begin{frame}[plain]
+  \titlepage
+
+  \begin{center}
+    \texttt{https://github.com/{\color{red}TheCedarsSchool}/{\color{blue}computing}}
+  \end{center}
+\end{frame}
+
+
+\begin{frame}{Language of the machine}
+  %% \begin{quote}
+  %%   ``It is essential to have a beard if one is to be a great computer scientist'' -anon
+  %% \end{quote}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth]{../figures/dennisRitchie.jpg}
+  \end{figure}
+  \begin{center}
+    Dennis Ritchie (1941 - 2011); creator of C
+  \end{center}
+\end{frame}
+
+
+\begin{frame}{Overview}
+  \tableofcontents
+\end{frame}
+
+
+\section{The problem with computers}
+
+
+\begin{frame}{Counting}
+  \begin{definition}
+    A natural number is any integer (whole number) greater than or equal to zero
+  \end{definition}\pause
+
+  \begin{equation*}
+    c \ge 0
+  \end{equation*}\pause
+
+  \begin{example}
+    \begin{itemize}
+    \item 0
+    \item 145
+    \item 68370912
+    \end{itemize}
+  \end{example}
+\end{frame}
+
+
+\begin{frame}{But knowing when to stop}
+  \begin{definition}
+    A finite natural number is any natural number less than or equal to some maximum value
+  \end{definition}\pause
+
+  \begin{equation*}
+    0 \le c \le max
+  \end{equation*}\pause
+
+  \begin{example}
+    \begin{itemize}
+    \item 00000000
+    \item 00000145
+    \item 68370912
+    \end{itemize}
+    where 99999999 is the maximum
+  \end{example}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Computers can add too}
+  \begin{lstlisting}
+    #include "stdio.h"
+
+    int main()
+    {
+      unsigned short a =  5000;
+      unsigned short b = 61000;
+      unsigned short c;
+
+      c = a + b;
+
+      printf("%d", c);
+    }
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{When it all goes wrong}
+  Ariane 5 rocket, Flight 501, 4 June 1996 exploded
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{../figures/ariane_v501.jpg}
+  \end{figure}
+  because a line of its code tried to store a number which was too big.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{So maybe ``max'' was important after all...}
+  One way find ``max'' is to keep adding 1 until something strange happens
+  \vspace{5mm}
+  \begin{lstlisting}
+    #include "stdio.h"
+
+    int main()
+    {
+      unsigned short c = 0;
+      unsigned short c_plus_1 = 1;
+
+      while (c_plus_1 == c + 1)
+      {
+        c = c + 1;
+        c_plus_1 = c_plus_1 + 1;
+      }
+
+      printf("%d", c);
+    }
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{A 12 hour clock for a 24 hour day}
+  What time is 14:00 on a clock?
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.25\textwidth]{../figures/clock.png}
+  \end{figure}
+  \begin{lstlisting}
+    print(14 % 12)
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Back to the mysterious addition}
+  \begin{lstlisting}
+    a =  5000
+    b = 61000
+
+    c = a + b
+
+    print(c % 65535)
+  \end{lstlisting}
+\end{frame}
+
+
+\section{Counting up to one}
+
+
+\begin{frame}{So can we not have bigger numbers?}
+  1988: Sega Genesis (16-bit console)
+  \begin{center}
+    \includegraphics[width=0.65\textwidth]{../figures/segaGenesis.jpg}
+  \end{center}
+\end{frame}
+
+
+\begin{frame}{So can we not have bigger numbers?}
+  1994: Sony PlayStation (32-bit console)
+  \begin{center}
+    \includegraphics[width=0.65\textwidth]{../figures/playStation.jpg}
+  \end{center}
+\end{frame}
+
+
+\begin{frame}{So can we not have bigger numbers?}
+  1996: Nintendo 64 (64-bit console)
+  \begin{center}
+    \includegraphics[width=0.65\textwidth]{../figures/nintendo64.jpg}
+  \end{center}
+\end{frame}
+
+
+\begin{frame}{Everything is made of bits}
+  \begin{itemize}
+  \item binary digits (bits) are a like ordinary digits ({\color{red}0} to {\color{red}9}), but there are less of them.\newline In fact there are only {\color{blue}two}: {\color{red}0} and {\color{red}1}.\pause \vspace{5mm}
+  \item {\color{red}105} is ``{\color{red}1} times {\color{blue}100}, plus {\color{red}0} times {\color{blue}10}, plus {\color{red}5} times {\color{blue}1}''.\pause \vspace{5mm}
+  \item More importantly, it is also 01101001, expressed in (8-bit) binary.\pause \vspace{5mm}
+  \item And the maximum an 8-bit number can represent is 11111111,\newline which is 255.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{How many bits does my number need?}
+  \begin{lstlisting}
+    #include "stdio.h"
+
+    int main()
+    {
+      unsigned long c = 0;
+      unsigned long c_max = 65535;
+
+      unsigned long order  = 1;
+      unsigned long n_bits = 0;
+
+      while (c < c_max)
+      {
+        c = c + order;
+        order = 2 * order;
+        n_bits = n_bits + 1;
+      }
+
+      printf("%d", n_bits);
+    }
+  \end{lstlisting}
+\end{frame}
+
+
+\section{Roman secret messaging service}
+
+
+\begin{frame}{Old-style encryption}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.3\textwidth]{../figures/juliusCaesar.jpg}
+  \end{figure}
+  \begin{center}
+    Julius Caesar (100 - 44BC)
+  \end{center}
+\end{frame}
+
+
+\begin{frame}{How it works (encryption)}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figures/cypherSchematic.pdf}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}{How it works (decryption)}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figures/uncypherSchematic.pdf}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}{Julius didn't trust everyone...}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{../figures/caesarCypher.jpg}
+  \end{figure}
+  \begin{center}
+    Key = 25: A becomes Z, B becomes A,...
+  \end{center}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{...only his closest pals}
+  \begin{lstlisting}
+    def cypher(message, key = 13):
+      result = ""
+      a_value = ord('a')
+
+      for letter in message:
+
+        value = ord(letter)
+        value_0 = value - a_value
+
+        if letter.islower():
+          value_0 = (value_0 + key) % 26
+
+        value = value_0 + a_value
+        result = result + chr(value)
+
+      return result
+
+    print(cypher("nyrn vnpgn rfg"))
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}{ASCII Tables}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.3\textwidth]{../figures/ascii97.png}
+  \end{figure}
+\end{frame}
+\end{document}
