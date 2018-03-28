@@ -1,11 +1,13 @@
 // mp_reversed_map_from_list
 template<class L, class S> struct mp_reversed_map_from_list_impl;
 
+
 template<template<class...> class L, class... T, std::size_t... J>
 struct mp_reversed_map_from_list_impl<L<T...>, std::integer_sequence<std::size_t, J...> >
 {
   using type = mp_list<mp_list<T, mp_size_t<J> >...>;
 };
+
 
 template<class L> using mp_reversed_map_from_list =
   typename mp_reversed_map_from_list_impl<L, std::make_index_sequence<mp_size<L>::value> >::type;
@@ -17,6 +19,7 @@ template<class L> using mp_reversed_map_from_list =
 template<class L, class S, std::size_t I, std::size_t NI, std::size_t NJ>
 struct mp_dual_impl;
 
+
 template<template<class...> class L,
          template<class SX, SX...> class S, class ST, ST... SVs,
          std::size_t I, std::size_t NI, std::size_t NJ>
@@ -24,6 +27,7 @@ struct mp_dual_impl<L<>, S<ST, SVs...>, I, NI, NJ>
 {
   using type = mp_list<>;
 };
+
 
 template<template<class...> class L,
          template<class SX, SX...> class S, class ST, ST SV, ST... SVs,
@@ -59,6 +63,7 @@ struct mp_dual_impl_valid<L<T, Ts...>, S<ST, SV, SVs...>, I, NI, NJ, J>
 template<class L, class S, std::size_t I, std::size_t NI, std::size_t NJ>
 struct mp_dual_impl_invalid;
 
+
 template<template<class...> class L, class T, class... Ts,
          template<class _SX, _SX...> class S, class ST, ST SV, ST... SVs,
          std::size_t I, std::size_t NI, std::size_t NJ>
@@ -83,6 +88,7 @@ struct mp_dual_impl<L<T, Ts...>, S<ST, SV, SVs...>, I, NI, NJ>
     >::type;
 };
 
+
 template<typename L, std::size_t NI>
 struct mp_dual_entry
 {
@@ -93,5 +99,6 @@ struct mp_dual_entry
   using D = mp_dual_impl<MS, IS, 0, NI, NJ>;
   using type = typename D::type;
 };
+
 
 template<class L, std::size_t NI> using mp_dual = typename mp_dual_entry<L, NI>::type;
