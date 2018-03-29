@@ -1,0 +1,237 @@
+% \documentclass{beamer}
+\documentclass[xcolor=dvipsnames]{beamer}
+%% \usecolortheme[named=Blue]{structure}
+\setbeamersize{text margin left=30mm, text margin right=30mm}
+\useoutertheme{infolines}
+\usetheme[height=7mm]{Rochester}
+\setbeamertemplate{items}[ball]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{default}
+\usepackage[english]{babel}
+\usepackage{geometry}
+%% \usepackage{fullpage}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{listings}
+\usepackage{pxfonts}
+%% \usepackage{color}
+%% \usepackage{graphicx}
+%% \usepackage{natbib}
+%% \usepackage{array}
+%% \usepackage{booktabs}
+%% \usepackage{tabu}
+%% \usepackage[utf8]{inputenc}
+%% \usepackage{fancyhdr}
+%% \usepackage{float}
+%% \usepackage{subfigure}
+%% \usepackage{titlesec}
+
+
+\definecolor{lstgray}{gray}{0.97}
+\lstset{ %
+  language=C++,
+  basicstyle=\footnotesize\ttfamily,
+  %% basicstyle=\ttfamily,
+  %% keywordstyle=\color{blue}\ttfamily,
+  keywordstyle=\bfseries,
+  stringstyle=\color{red}\ttfamily,
+  commentstyle=\color{green}\ttfamily,
+  morecomment=[l][\color{magenta}]{\#},
+  backgroundcolor=\color{lstgray},
+  %% keywordstyle=\color{red},
+  frame=f,
+  frameround=ffff,
+  tabsize=2,
+  breaklines=true,
+  breakatwhitespace=false,
+  showspaces=false,
+  showstringspaces=false,
+  xleftmargin=5pt,
+  xrightmargin=5pt,
+  morekeywords={in,out,ref,auto,inout,import,ushort,scope,exit,mixin}
+}
+
+\def\sectionname{\translate{Section}}
+\def\insertsectionnumber{\arabic{section}}
+\setbeamertemplate{section page}
+{
+  \begin{centering}
+    \begin{beamercolorbox}[sep=4pt,center]{part title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \end{centering}
+}
+\def\sectionpage{\usebeamertemplate*{section page}}
+
+
+\AtBeginSection{\frame{\sectionpage}}
+
+
+\title{Discrete Adjoint}
+\subtitle{Another Perspective}
+\author{Dominic Jones}
+%% \institute{CD-adapco, London}
+\date{December 2013}
+
+
+\begin{document}
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+
+\section{Leveraging the Compiler}
+
+
+\begin{frame}{General remarks}
+\begin{itemize}
+\item Compilers compile one translation unit at a time; to scale with compilation the generation of derivative code should follow the same design \vspace{5mm}
+\item Compilers optimise intermediate code; generation of the derivative could benefit from this \vspace{5mm}
+\item Functional programming lends itself to implementing derivatives of functions, to compiler optimisation and component programming
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Technology and trends}
+\begin{itemize}
+\item Composing a language from domain-specific embedded languages is an approach taken by Laurence Tratt at King’s College: instead of a language providing every feature, present a language which provides the tools to extend the language (but not beyond recognition) \vspace{5mm}
+\item Template expressiveness and compile time function evaluation features are continually being developed \vspace{5mm}
+\item The D programming language offers a handful of features which, when considered collectively, are very appealing for writing a compile-time embedded derivative code generator, or at the very least minimising the tediuum, code duplication and run-time costs of typical derivative implementations
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Roll your own -- Improved}
+ D offers the following helping hands:
+\vspace{5mm}
+\begin{itemize}
+\item \texttt{static if} \vspace{5mm}
+\item \texttt{immutable} types \vspace{5mm}
+\item \texttt{scope(exit)} \vspace{5mm}
+\item compile time function evaluation via \texttt{static auto v = ...} \vspace{5mm}
+\item \texttt{mixin template} \vspace{5mm}
+\item \texttt{std.functional.memoize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Ingredients: scope (exit)}
+Given some function, have the adjoint statements written in the same order as the primal statements. So if the function is originally:
+\vspace{2mm}
+  \begin{lstlisting}
+void eval(in Primal a, in Primal b, out Primal c) {
+  auto w1 = a * b;
+  auto w2 = w1 * (a - b);
+  c = w2 / w1;
+}
+  \end{lstlisting}
+\vspace{2mm}
+then after being differentiated, it may look something like...
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Ingredients: scope (exit)}
+  \begin{lstlisting}
+void eval(ref Dual a, ref Dual b, ref Dual c) {
+  auto w1 = tuple!Dual(a[0] * b[0], 0);
+  scope (exit) {
+    b[1] += a[0] * w1[1];
+    a[1] += b[0] * w1[1];
+  }
+
+  auto w2 = tuple!Dual(w1[0] * (a[0] - b[0]), 0);
+  scope (exit) {
+    w1[1] += (a[0] - b[0]) * w2[1];
+    a[1] -= b[0] * w2[1];
+    b[1] += a[0] * w2[1];
+  }
+
+  c = tuple!Dual(w2[0] / w1[0], 0);
+  scope (exit) {
+    w2[1] += c[1] / w1[0];
+    w1[1] -= w2[0] * c[1] / w1[0]^^2;
+  }
+}
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Ingredients: static if}
+If the primal, tangent and adjoint statement can be written in the same order (using scope-exit), then perhaps a single function can embody the three versions without run-time overhead
+\vspace{2mm}
+  \begin{lstlisting}
+void eval(Mode, Type)(ref Type a, ref Type b, ref Type c) {
+  auto w1 = Type(a * b);
+  static if (Mode.stringof == 'Tangent') {
+    w1[1] = a[0] * b[1] + a[1] * b[0];
+  }
+  else if (Mode.stringof == 'Adjoint') {
+    scope (exit) {
+      b[1] += a[0] * w1[1];
+      a[1] += b[0] * w1[1];
+    }
+  }
+
+  ...
+}
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Ingredients: CTFE and mixin}
+Using scope-exit and static-if still looks clumsy. One clean up could then be to parse the primal statement, generating its tangent or adjoint and mixing it in to the code
+\vspace{2mm}
+  \begin{lstlisting}
+void eval(Mode, Type)(ref Type a, ref Type b, ref Type c) {
+  mixin(generate!Mode('auto w1 = Type(a * b);'));
+
+  ...
+}
+  \end{lstlisting}
+\vspace{2mm}
+where \texttt{generate(Mode)(statement)} would return (as a string) the adjoint statements and primal statement if the mode is adjoint, tangent statement and primal statement for the tangent mode and the primal statement for only the primal mode.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Ingredients: CTFE and mixin}
+\begin{itemize}
+\item If \texttt{generate(Mode)(statement)} is used just in a statement-wise way, the implementation of the function would be quite simple, relying on compiler introspection to fill in the type details. \vspace{5mm}
+\item A more sophisiticated \texttt{generate} parser may operate on a whole function or module. In this case the parser would need to be able to parse the language properly. \texttt{https://github.com/PhilippeSigaud/Pegged} offers such a parser. \vspace{5mm}
+\item Having code written as strings is hardly ideal.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Ingredients: mixin modules}
+It's perhaps better to generate the derivative code in a separate file rather than clutter original implementations of functions.
+  \begin{lstlisting}
+module solver;
+
+void solve(in double x, out double f)
+{
+  ...
+}
+  \end{lstlisting}
+However, this approach may require significant work to be implemented.
+  \begin{lstlisting}
+module solver_derivative;
+
+mixin(generate!Tangent(import("solver.d")));
+mixin(generate!Adjoint(import("solver.d")));
+
+unittest {
+  solve_tng(x, x_tng, f, f_tng);
+  solve_adj(x, x_adj, f, f_adj);
+}
+  \end{lstlisting}
+\end{frame}
+
+\end{document}
