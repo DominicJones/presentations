@@ -1,0 +1,6 @@
+\beamer@endinputifotherversion {3.36pt}
+\select@language {english}
+\beamer@sectionintoc {1}{Nature - `It should just work'}{2}{0}{1}
+\beamer@sectionintoc {2}{Scientific computation - `\texttt {T = abs(T)}'}{6}{0}{2}
+\beamer@sectionintoc {3}{Bridging the Nature --- Computation dichotomy}{14}{0}{3}
+\beamer@sectionintoc {4}{Incidentally...}{19}{0}{4}
