@@ -1,0 +1,375 @@
+% \documentclass{beamer}
+\documentclass[xcolor=dvipsnames]{beamer}
+%% \usecolortheme[named=Blue]{structure}
+\setbeamersize{text margin left=30mm, text margin right=30mm}
+\useoutertheme{infolines}
+\usetheme[height=7mm]{Rochester}
+\setbeamertemplate{items}[ball]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{default}
+\usepackage[english]{babel}
+\usepackage{geometry}
+%% \usepackage{fullpage}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{listings}
+\usepackage{pxfonts}
+%% \usepackage{color}
+%% \usepackage{graphicx}
+%% \usepackage{natbib}
+%% \usepackage{array}
+%% \usepackage{booktabs}
+%% \usepackage{tabu}
+%% \usepackage[utf8]{inputenc}
+%% \usepackage{fancyhdr}
+%% \usepackage{float}
+%% \usepackage{subfigure}
+%% \usepackage{titlesec}
+
+
+\definecolor{lstgray}{gray}{0.97}
+\lstset{ %
+  escapechar=@,
+  language=C++,
+  basicstyle=\footnotesize\ttfamily,
+  %% basicstyle=\ttfamily,
+  %% keywordstyle=\color{blue}\ttfamily,
+  keywordstyle=\bfseries,
+  stringstyle=\color{red}\ttfamily,
+  commentstyle=\color{OliveGreen}\ttfamily,
+  morecomment=[l][\color{magenta}]{\#},
+  backgroundcolor=\color{lstgray},
+  %% keywordstyle=\color{red},
+  frame=f,
+  frameround=ffff,
+  tabsize=2,
+  breaklines=true,
+  breakatwhitespace=false,
+  showspaces=false,
+  showstringspaces=false,
+  xleftmargin=5pt,
+  xrightmargin=5pt,
+  morekeywords={in,out,ref,auto,inout,import,ushort,scope,exit,mixin}
+}
+
+\def\redcolor{\color{red}}
+\def\bluecolor{\color{blue}}
+\def\blackcolor{\color{black}}
+
+
+\def\sectionname{\translate{Section}}
+\def\insertsectionnumber{\arabic{section}}
+\setbeamertemplate{section page}
+{
+  \begin{centering}
+    \begin{beamercolorbox}[sep=4pt,center]{part title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \end{centering}
+}
+\def\sectionpage{\usebeamertemplate*{section page}}
+
+
+\AtBeginSection{\frame{\sectionpage}}
+
+
+\title{Block Scope Differentiation}
+\subtitle{AD2016 Oxford}
+%% \author{\texorpdfstring{Author\newline\url{email@email.com}}{Dominic Jones}}
+\author{Dominic Jones}
+%% \author{Author\\{\tiny email@email.com}}
+\institute{\texttt{dominic.jones@gmx.co.uk}}
+\date{London, September 2016}
+
+
+\begin{document}
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+
+\section{Aim}
+
+
+\begin{frame}{An additional helping hand}
+\begin{itemize}
+\item The aim is to have the fastest possible differentiation tool \vspace{5mm}
+\item In \texttt{C++}, with 2011 standard available \vspace{5mm}
+\item Which can integrate with existing framework \vspace{5mm}
+\item Does not introduce unusual syntax \vspace{5mm}
+\item A small tool which is easy to use selectively \vspace{5mm}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Target}
+\begin{itemize}
+\item Modern, commercial, CFD software \vspace{2mm}
+\item Adjoint differentation of coupled Navier-Stokes solver \vspace{2mm}
+\item Calculation of element cell terms via face-cell loops \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+for (f = 0; f != N; ++f)
+{
+  // cache input fields
+  const Vector<3,double> A_f{A[f]};
+  const Vector<3,float> U_f{U[f]};
+  const double rho_f{rho[f]};
+
+  // compute local values
+  const double spd{dot(U_f, A_f)};
+  const float flux{rho_f * spd};
+
+  // write results
+  R[f](0) += flux * U_f;
+  R[f](1) -= flux * U_f;
+}
+\end{lstlisting}
+\end{frame}
+
+
+\section{Method}
+
+
+\begin{frame}[fragile]{\emph{l-value} destructor}
+\begin{itemize}
+\item If the loop block does not have nested scopes then the reverse sequence of destructor operations could be harnessed \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+@\aftergroup\bluecolor@mode@\aftergroup\blackcolor@ = ADJOINT;
+{
+  ...
+
+  // compute local values
+  const @\aftergroup\bluecolor@Drv@\aftergroup\blackcolor@<@\aftergroup\bluecolor@mode@\aftergroup\blackcolor@,double> spd{dot(U_f, A_f)};
+  const @\aftergroup\bluecolor@Drv@\aftergroup\blackcolor@<@\aftergroup\bluecolor@mode@\aftergroup\blackcolor@,float> flux{rho_f * spd};
+
+  ...
+  @\aftergroup\redcolor@
+  ~flux() { rho_f.adj() += spd.pri() * flux.adj();
+            spd.adj() += rho_f.pri() * flux.adj(); }
+
+  ~spd() { U_f.adj() += A_f.pri() * spd.adj();
+           A_f.adj() += U_f.pri() * spd.adj(); }@\aftergroup\blackcolor@
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Caching the expression}
+\begin{itemize}
+\item With a reasonable guess of the {\color{blue}expression size}, a copy could be made during construction and then evaluated later by some {\color{red}engine} \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+{
+  ...
+
+  const Drv<mode,float,@\aftergroup\bluecolor@expr_size@\aftergroup\blackcolor@> flux{@\aftergroup\bluecolor@rho_f * spd@\aftergroup\blackcolor@};
+
+  ...
+
+  @\aftergroup\redcolor@~flux()
+  {
+    (*this->_adjointExpression)(this->_expr, this->_adj);
+  }@\aftergroup\blackcolor@
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Typelessness}
+\begin{itemize}
+\item At construction, the {\color{red}expression} gets copied to a local array and a {\color{blue}function pointer} to the adjoint expression engine is stored \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+template<Mode m, typename T, int s>
+class Drv<m,ExprCache<T,s> > : public Drv<m,T>
+{
+  using AdjointExpression_t =
+    void(*)(void const * const, T const &);
+
+  // constructor
+  template<typename Expr_t> Drv(Expr_t const &expr)
+    : Drv<m,T>(primalExpression<Expr_t>(expr))
+    , @\aftergroup\redcolor@_expr(memcpy(sizeof(expr), expr))@\aftergroup\blackcolor@
+    , @\aftergroup\bluecolor@_adjointExpression(&adjointExpression<Expr_t,T>)@\aftergroup\blackcolor@
+  {}
+
+  // members
+  @\aftergroup\redcolor@std::array<char,s> _expr;@\aftergroup\blackcolor@
+  @\aftergroup\bluecolor@AdjointExpression_t _adjointExpression;@\aftergroup\blackcolor@
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Type retention via \texttt{auto}}
+\begin{itemize}
+\item To facilitate \texttt{auto}, an {\color{blue}\texttt{assign}} function is required to build the correct \emph{l-value} type \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+{
+  ...
+
+  // compute local values
+  const auto flux{@\aftergroup\bluecolor@assign(@\aftergroup\blackcolor@rho_f * spd@\aftergroup\bluecolor@)@\aftergroup\blackcolor@};
+
+  ...
+
+  @\aftergroup\redcolor@~flux()
+  {
+    adjointExpression<Expr_t,T>(this->_expr, this->_adj);
+  }@\aftergroup\blackcolor@
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}{Expression context}
+\begin{itemize}
+\item Separate the context of how an expression is to be evaluated from the expression itself \vspace{5mm}
+\item Made possible with user-defined types and operator overloading \vspace{5mm}
+\item But needs to support arithmetic with mixed types ({\color{blue}\texttt{float}, \texttt{double}, \texttt{Vector<N,T>}, \texttt{Tensor<N,T>}}) \vspace{5mm}
+\item Must co-exist with other operator overloading tools ({\color{blue}\texttt{PETE}}, Los Alamos National Laboratory) \vspace{5mm}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Expression tree}
+\begin{itemize}
+\item Nodes templated on operator, result and argument types \vspace{2mm}
+\item Sub-nodes may be passive (non-differentiable) or active \vspace{2mm}
+\item Sub-nodes may be owned by value or by reference \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+// expression
+@\aftergroup\redcolor@dot(U_f, A_f);@\aftergroup\blackcolor@
+
+// expression type
+@\aftergroup\bluecolor@Binary<Dot,
+       double,
+       Drv<mode,Vector<3,float>>,
+       Drv<mode,Vector<3,double>>
+      >@\aftergroup\blackcolor@
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Writing to the inputs}
+\begin{itemize}
+\item A differentiatable type retains the address either to its own adjoint value else to the adjoint value it was constructed with \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+template<Mode m, typename T>
+class Drv : public ExpressionNode<m,T,Drv<T> >
+{
+  Drv(T const &pri, @\aftergroup\bluecolor@T &drv@\aftergroup\blackcolor@)
+    : _pri(pri), _drv(drv), @\aftergroup\redcolor@_adj(drv)@\aftergroup\blackcolor@
+  {}
+
+  T const &pri() const { return _pri; }
+  void adj(T const &rhs) const { @\aftergroup\redcolor@_adj += rhs;@\aftergroup\blackcolor@ }
+
+  T _pri, _drv;
+  @\aftergroup\redcolor@T &_adj;@\aftergroup\blackcolor@
+};
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Function signature}
+\begin{itemize}
+\item {\color{red}Mutable} and {\color{blue}immutable} types have slightly different syntax \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+template<Mode mode>
+void
+evaluate(@\aftergroup\bluecolor@const@\aftergroup\blackcolor@ Drv<mode,double> & A,
+         @\aftergroup\bluecolor@const@\aftergroup\blackcolor@ Drv<mode,double> & B,
+         Drv<mode,double@\aftergroup\redcolor@&@\aftergroup\blackcolor@> Z)
+{
+  const Drv<mode,double,10> T0{A * B};
+  const Drv<mode,double,15> T1{reciprocal(A + B)};
+  Z = T0 * T1;
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Function invocation}
+\begin{itemize}
+\item Adjoint evaluation is no more than the function call \vspace{2mm}
+\end{itemize}
+\begin{lstlisting}
+double a_pri{3}, b_pri{4};
+
+double a_adj{0}, b_adj{0};
+double @\aftergroup\bluecolor@z_adj{1};@\aftergroup\blackcolor@
+
+evaluate(Drv<mode,double>{a_pri, @\aftergroup\redcolor@a_adj@\aftergroup\blackcolor@},
+         Drv<mode,double>{b_pri, @\aftergroup\redcolor@b_adj@\aftergroup\blackcolor@},
+         Drv<mode,double&>{@\aftergroup\bluecolor@z_adj@\aftergroup\blackcolor@});
+
+std::cout << @\aftergroup\redcolor@a_adj@\aftergroup\blackcolor@ << std::end;
+std::cout << @\aftergroup\redcolor@b_adj@\aftergroup\blackcolor@ << std::end;
+\end{lstlisting}
+\end{frame}
+
+
+\section{Testing}
+
+
+\begin{frame}[fragile]{Harmonic function}
+\begin{itemize}
+\item Test case used by NAG \vspace{5mm}
+\item 5 inputs, 1 output, 100 lines \vspace{5mm}
+\item \verb|github.com/DominicJones/AD2016_Oxford| \vspace{5mm}
+\item Five approaches to evaluating the adjoint: \vspace{2mm}
+  \begin{enumerate}
+  \item Adept AD operator overloading tool (13.3x) \vspace{2mm}
+  \item Tapenade AD source transformation tool (1.9x) \vspace{2mm}
+  \item {\color{blue}typeless expression caching (5.8x)} \vspace{2mm}
+  \item {\color{blue}typed expression caching (using \texttt{auto}) (5.8x)} \vspace{2mm}
+  \item {\color{red}naive use of \texttt{auto} (320x)} \vspace{2mm}
+\end{enumerate}
+\item timings are median average of 50 evaluations, 100,000 iterations per evaluation (g++ 5.1 -O3, Intel Xeon E5-2650)
+\end{itemize}
+\end{frame}
+
+
+%% mixed types
+%% different approaches
+%% branch re-evaluation
+
+
+\section{Further work}
+
+
+\begin{frame}[fragile]{Removing the expression copying}
+\begin{itemize}
+\item Copying every expression so that it can be used in the destructor is the principle hit on performance \vspace{5mm}
+\item Instead, make the expression nodes perform the adjoint evaluation in \emph{their} destructors \vspace{5mm}
+\item \texttt{auto} must be used in place of an \emph{l-value} type \vspace{5mm}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Supporting \texttt{if} blocks}
+\begin{itemize}
+\item Already possible, but tree must always own sub-nodes by value \vspace{5mm}
+\item Within the nested scope, naive use of \texttt{auto} is necessary \vspace{5mm}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{\texttt{auto} return type}
+\begin{itemize}
+\item With the 2014 standard, expression types can be returned from functions \vspace{5mm}
+\item Removes the need to maintain function call back pointers \vspace{5mm}
+\item But the expression must hold copies of local variables, rather than references \vspace{5mm}
+\end{itemize}
+\end{frame}
+
+
+\end{document}
