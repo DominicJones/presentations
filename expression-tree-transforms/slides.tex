@@ -724,7 +724,7 @@ static_assert(
          10        20
 1
 2  // main.cpp
-3
+3@\aftergroup\blackcolor@  auto x = 42;@\aftergroup\graycolor@
 4@\aftergroup\blackcolor@  decltype(x)* y = &x;@\aftergroup\graycolor@
 5
 @\aftergroup\bluecolor@   reflect          reflect
@@ -739,7 +739,7 @@ static_assert(
          10        20
 1
 2  // main.cpp
-3
+3@\aftergroup\blackcolor@  auto x = 42;@\aftergroup\graycolor@
 4@\aftergroup\blackcolor@  auto constexpr y = &x;@\aftergroup\graycolor@
 5
 @\aftergroup\redcolor@                      reflect
@@ -747,7 +747,7 @@ static_assert(
 
 
 @\aftergroup\redcolor@y = hash(row, column, filename)@\aftergroup\graycolor@
-@\aftergroup\redcolor@  = hash(4, 23, "main.cpp")@\aftergroup\graycolor@
+@\aftergroup\redcolor@  = hash(3, 8, "main.cpp")@\aftergroup\graycolor@
 
  \end{lstlisting}
     \end{column}%
