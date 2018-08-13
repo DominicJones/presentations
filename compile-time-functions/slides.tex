@@ -194,14 +194,14 @@ struct front<L<@\aftergroup\bluecolor@T1@\aftergroup\blackcolor@, T...> >
 \begin{frame}[fragile]{Incomplete types}
 \begin{lstlisting}
 // could be written as a class template...
-template<class T> using add_pointer = T*;
+template<class T> using @\aftergroup\bluecolor@add_pointer@\aftergroup\blackcolor@ = T*;
 \end{lstlisting}
 
 ~
 
 \begin{lstlisting}
 // (to be revisited)
-template<template<class... T> class F> struct bind;
+template<template<class... T> @\aftergroup\bluecolor@class F@\aftergroup\blackcolor@> struct bind;
 \end{lstlisting}
 
 ~
@@ -216,8 +216,8 @@ using incomplete_type = bind<@\aftergroup\bluecolor@add_pointer@\aftergroup\blac
 
 \begin{frame}[fragile]{Lazy construction}
 \begin{lstlisting}
-// nesting defers type construction...
-template<int N> struct lazy_seq
+// nesting defers type construction
+template<int N> struct @\aftergroup\bluecolor@lazy_seq@\aftergroup\blackcolor@
 {
   using type = std::make_index_sequence<N>;
 };
@@ -227,8 +227,8 @@ template<int N> struct lazy_seq
 
 \begin{lstlisting}
 // requiring additional `::type' wrapper
-template<bool C, int NT, int NF>
-using make_seq = std::conditional_t<C, @\aftergroup\bluecolor@lazy_seq@\aftergroup\blackcolor@<NT>,
+template<bool B, int NT, int NF>
+using make_seq = std::conditional_t<B, @\aftergroup\bluecolor@lazy_seq@\aftergroup\blackcolor@<NT>,
                                        @\aftergroup\bluecolor@lazy_seq@\aftergroup\blackcolor@<NF> >;
 \end{lstlisting}
 \end{frame}
@@ -303,7 +303,7 @@ r = A[i] + B[i];
     \begin{column}{0.35\textwidth}
       \begin{figure}[H]
         \centering
-        \includegraphics[width=4.3cm]{fig_expr_c}
+        \includegraphics[width=4.3cm]{fig_expr_cb}
         \caption*{\texttt{(A + B)[i]}}
       \end{figure}
     \end{column}%
@@ -311,7 +311,7 @@ r = A[i] + B[i];
     \begin{column}{0.55\textwidth}
       \begin{figure}[H]
         \centering
-        \includegraphics[width=7cm]{fig_expr_opt_c}
+        \includegraphics[width=7cm]{fig_expr_opt_cb}
         \caption*{\texttt{A[i] + B[i]}}
       \end{figure}
     \end{column}%
@@ -435,7 +435,7 @@ using greater_than = bool_t<(sizeof(X) > sizeof(Y))>;
 \begin{lstlisting}
 // example
 using L = list<int, bool, char, double>;
-using R = apply<L, bind<greater_than, @\aftergroup\bluecolor@_1@\aftergroup\blackcolor@, @\aftergroup\bluecolor@_2@\aftergroup\blackcolor@> >::type;
+using R = apply_t<L, bind<greater_than, @\aftergroup\bluecolor@_1@\aftergroup\blackcolor@, @\aftergroup\bluecolor@_2@\aftergroup\blackcolor@> >;
 \end{lstlisting}
 \end{frame}
 
@@ -450,7 +450,7 @@ struct @\aftergroup\bluecolor@_1@\aftergroup\blackcolor@;  struct @\aftergroup\b
 
 \begin{lstlisting}
 // accepts a type of the form `F<T...>'
-// and, optionally, some others too
+// and, optionally, some other types too
 template<template<class...> class, @\aftergroup\bluecolor@class...@\aftergroup\blackcolor@> struct bind;
 \end{lstlisting}
 \end{frame}
@@ -482,7 +482,7 @@ struct apply<L<T, Ts...>, bind<F, @\aftergroup\bluecolor@_1@\aftergroup\blackcol
 \begin{lstlisting}
 // `greater_than' must be forwarded to an `apply'
 // specialised for two function variables
-using R = apply<L, bind<greater_than, @\aftergroup\bluecolor@_1@\aftergroup\blackcolor@, @\aftergroup\bluecolor@_2@\aftergroup\blackcolor@> >::type;
+using R = apply_t<L, bind<greater_than, @\aftergroup\bluecolor@_1@\aftergroup\blackcolor@, @\aftergroup\bluecolor@_2@\aftergroup\blackcolor@> >;
 \end{lstlisting}
 \end{frame}
 
@@ -618,8 +618,25 @@ using S = make_seq_t<5000>; // compile time: 0.148s
 \end{frame}
 
 
-
 \section{Mapping indices}
+
+
+\begin{frame}[fragile]{Storing data off the tree}
+\begin{lstlisting}
+auto evaluate(A &a, B &b)
+{
+  // (to be revisited)
+  auto @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = 4.2_f;
+  auto @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = rand();
+
+  // build expression tree
+  auto t0 = a * b;
+  auto t1 = @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ + t0;
+  auto t2 = @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ + t0;
+  return t1 / t2;
+}
+\end{lstlisting}
+\end{frame}
 
 
 \begin{frame}[fragile]{Storing data off the tree}
@@ -630,7 +647,7 @@ using S = make_seq_t<5000>; // compile time: 0.148s
     \begin{column}{0.75\textwidth}
       \begin{figure}[H]
         \centering
-        \includegraphics[width=0.99\textwidth]{fig_exprtree_c}
+        \includegraphics[width=0.99\textwidth]{fig_exprtree_cb}
       \end{figure}
     \end{column}%
   \end{columns}
@@ -659,8 +676,8 @@ then flattening...
 \end{frame}
 
 
-\begin{frame}[fragile]{Mapping data to nodes}
-Storage of {\color{blue}\texttt{C0}} and {\color{blue}\texttt{C1}} is required
+\begin{frame}[fragile]{Mapping nodes to data}
+Look-up of {\color{blue}\texttt{C0}} and {\color{blue}\texttt{C1}} required
 \begin{lstlisting}
   L = {A,                                //  0
        B,                                //  1
@@ -669,19 +686,21 @@ Storage of {\color{blue}\texttt{C0}} and {\color{blue}\texttt{C1}} is required
        Binary<Add, @\aftergroup\bluecolor@C1@\aftergroup\blackcolor@, [...]>,           //  4  <--
        Binary<Div, [...], [...]>}        //  5
 \end{lstlisting}
+\begin{lstlisting}
+  array<float, 2> @\aftergroup\bluecolor@c@\aftergroup\blackcolor@ = {4.2, rand()};
+\end{lstlisting}
 
 ~
 
-In `\texttt{L}' there are two constants at offsets 3 and 4
+Indices of constants in `\texttt{L}'
 \begin{lstlisting}
   IC = {3, 4}
 \end{lstlisting}
 
 ~
 
-To map the offset in `\texttt{L}' to a storage offset, the dual of `\texttt{IC}' is needed
+Map elements in `\texttt{L}' to storage offsets
 \begin{lstlisting}
-  // Dual of `IC', with size = 6
   DC = {2, 2, 2, 0, 1, 2}
 \end{lstlisting}
 \end{frame}
@@ -692,8 +711,8 @@ To map the offset in `\texttt{L}' to a storage offset, the dual of `\texttt{IC}'
 // homework
 //----------
 DC_SIZE = 6     \
-                 --- Dual --->    DC = {2, 2, 2, 0, 1, 2}
-IC = {3, 4}     /
+                 --- @\aftergroup\bluecolor@Dual@\aftergroup\blackcolor@ --->    DC = {2, 2, 2, 0, 1, 2}
+IC = {3, 4}     /                       @\aftergroup\graycolor@0  1  2  3  4  5@\aftergroup\blackcolor@
 \end{lstlisting}
 
 ~
@@ -723,17 +742,16 @@ IC_MAP = {{3, 0}, {4, 1}}
   \end{columns}
 
 \vspace{5mm}
-
 \footnotesize{\texttt{github.com/DominicJones/snippets/blob/master/Cxx/mp\_functions.cpp}}
 \end{frame}
 
 
-\section{Last things}
+\section{Four last things}
 
 
 \begin{frame}[fragile]{Mutually exclusive?}
 \begin{lstlisting}
-auto constexpr list = [](auto ...x)
+auto constexpr @\aftergroup\bluecolor@list@\aftergroup\blackcolor@ = [](auto ...x)
 {
   return [=](auto f){ return f(x...); };
 };
@@ -751,46 +769,8 @@ auto constexpr length = [](auto x)
 ~
 
 \begin{lstlisting}
-auto constexpr n = length(list(1, '2', 3.0));
+auto constexpr n = length(@\aftergroup\bluecolor@list@\aftergroup\blackcolor@(true, 'c', 3.14));
 \end{lstlisting}
-\end{frame}
-
-
-\begin{frame}[fragile]{The third realm}
-  \begin{columns}[T] % align columns
-    \begin{column}{0.47\textwidth}
-  \begin{lstlisting}
-
-
-
-// main.cpp
-@\aftergroup\blackcolor@auto x = 3;@\aftergroup\graycolor@
-@\aftergroup\blackcolor@decltype(x)* xp = &x;@\aftergroup\graycolor@
-
-@\aftergroup\bluecolor@reflect           reflect
-type              address@\aftergroup\graycolor@
-  \end{lstlisting}
-    \end{column}%
-    \hfill%
-    \begin{column}{0.53\textwidth}
- \begin{lstlisting}
-@\aftergroup\graycolor@ 1234567@\aftergroup\redcolor@8@\aftergroup\graycolor@9 123456789 12345
-         10        20
-1
-2  // main.cpp
-@\aftergroup\redcolor@3@\aftergroup\graycolor@@\aftergroup\blackcolor@  auto x = 3;@\aftergroup\graycolor@
-4@\aftergroup\blackcolor@  auto constexpr xl = &x;@\aftergroup\graycolor@
-5
-@\aftergroup\redcolor@                       reflect
-                       location@\aftergroup\graycolor@
-
-
-@\aftergroup\redcolor@y = hash(row, column, filename)@\aftergroup\graycolor@
-@\aftergroup\redcolor@  = hash(3, 8, "main.cpp")@\aftergroup\graycolor@
-
- \end{lstlisting}
-    \end{column}%
-  \end{columns}
 \end{frame}
 
 
@@ -828,6 +808,50 @@ std::string demangle()
 // very helpful
 std::cout << demangle(complicated_type{}) << std::endl;
 \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Low hanging fruit}
+\begin{lstlisting}
+// permit `auto' to resolve as `float'
+template<auto V>
+struct @\aftergroup\redcolor@_float@\aftergroup\blackcolor@
+{
+  constexpr operator auto() const { return V; }
+};
+
+// only interested in the type
+auto constexpr c0 = 4.2@\aftergroup\redcolor@_f@\aftergroup\blackcolor@;
+static_assert(c0 == @\aftergroup\redcolor@_float@\aftergroup\blackcolor@<4.2>{});
+\end{lstlisting}
+
+\vspace{5mm}
+\footnotesize{D has had this for years...}\newline
+\footnotesize{\texttt{dlang.org/spec/template.html}}
+\end{frame}
+
+
+\begin{frame}[fragile]{The third realm}
+\begin{lstlisting}
+@\aftergroup\graycolor@ 1234567@\aftergroup\bluecolor@8@\aftergroup\graycolor@9 123456789 12345
+         10        20
+1
+2  // main.cpp
+@\aftergroup\bluecolor@3@\aftergroup\graycolor@@\aftergroup\blackcolor@  auto @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = rand();@\aftergroup\graycolor@
+4@\aftergroup\blackcolor@  auto constexpr c1_loc = @\aftergroup\redcolor@&@\aftergroup\blackcolor@c1;@\aftergroup\graycolor@
+\end{lstlisting}
+
+~
+
+\begin{lstlisting}
+// reflect location
+@\aftergroup\redcolor@&@\aftergroup\blackcolor@c1 := @\aftergroup\redcolor@hash(row, column, filename)@\aftergroup\blackcolor@
+    := @\aftergroup\redcolor@hash(@\aftergroup\bluecolor@3@\aftergroup\redcolor@, @\aftergroup\bluecolor@8@\aftergroup\redcolor@, @\aftergroup\greencolor@`$PATH/main.cpp`@\aftergroup\redcolor@)
+\end{lstlisting}
+
+\vspace{5mm}
+\footnotesize{A rough draft on it...}\newline
+\footnotesize{\texttt{github.com/DominicJones/articles/blob/master/cxx-sg7-varid}}
 \end{frame}
 
 
