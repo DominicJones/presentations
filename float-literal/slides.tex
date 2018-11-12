@@ -95,7 +95,7 @@
 \AtBeginSection{\frame{\sectionpage}}
 
 
-\title{Float literal}
+\title{\texttt{float} template parameter}
 \subtitle{A workaround}
 \author{Dominic Jones}
 \date{\small{November 2018}}
@@ -148,7 +148,7 @@ static_assert(@\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ == @\aftergroup\
 
 %% @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@
 
-\begin{frame}[fragile]{Identifiers as types}
+\begin{frame}[fragile]{\emph{Identifiers as types}}
 \begin{lstlisting}
 @\aftergroup\graycolor@ 1234567@\aftergroup\bluecolor@8@\aftergroup\graycolor@9 123456789 12345
          10        20
@@ -160,8 +160,9 @@ static_assert(@\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ == @\aftergroup\
 
 
 \begin{lstlisting}
+// & works something like this...
 @\aftergroup\redcolor@&@\aftergroup\blackcolor@@\aftergroup\bluecolor@c1@\aftergroup\blackcolor@@\aftergroup\redcolor@@\aftergroup\blackcolor@ := @\aftergroup\redcolor@hash(row, column, filename)@\aftergroup\blackcolor@
-    := @\aftergroup\redcolor@hash(@\aftergroup\bluecolor@__LINE__@\aftergroup\redcolor@, @\aftergroup\bluecolor@8@\aftergroup\redcolor@, @\aftergroup\greencolor@__FILE__@\aftergroup\redcolor@)
+    := @\aftergroup\redcolor@hash(@\aftergroup\bluecolor@3@\aftergroup\redcolor@, @\aftergroup\bluecolor@8@\aftergroup\redcolor@, @\aftergroup\greencolor@`main.cpp'@\aftergroup\redcolor@)
 \end{lstlisting}
 
 ~
@@ -184,9 +185,9 @@ auto operator+(L const &@\aftergroup\bluecolor@l@\aftergroup\blackcolor@, R cons
 \begin{frame}[fragile]{D programming language}
 \begin{lstlisting}
 // exactly what is wanted
-struct Literal(@\aftergroup\bluecolor@float@\aftergroup\blackcolor@ V)
+struct _float(@\aftergroup\bluecolor@float@\aftergroup\blackcolor@ v)
 {
-  static immutable auto value = V;
+  static immutable auto value = v;
 }
 \end{lstlisting}
 
@@ -195,8 +196,16 @@ struct Literal(@\aftergroup\bluecolor@float@\aftergroup\blackcolor@ V)
 \begin{lstlisting}
 // f-p constant folding is done in real or greater precision.
 // Follows IEEE 754 rules and round-to-nearest is used.
-static assert(Literal!(@\aftergroup\redcolor@9.0/3@\aftergroup\blackcolor@).value ==
-              Literal!(@\aftergroup\redcolor@6.0/2@\aftergroup\blackcolor@).value);
+static assert(_float!(@\aftergroup\redcolor@9.0 / 3@\aftergroup\blackcolor@).value ==
+              _float!(@\aftergroup\redcolor@6.0 / 2@\aftergroup\blackcolor@).value);
+\end{lstlisting}
+
+~
+
+\begin{lstlisting}
+// Marks overflows as `_float!(infF)'
+static assert(_float!(@\aftergroup\redcolor@9.0 / 0@\aftergroup\blackcolor@).value ==
+              _float!(@\aftergroup\redcolor@6.0 / 0@\aftergroup\blackcolor@).value);
 \end{lstlisting}
 \end{frame}
 
@@ -214,6 +223,22 @@ static assert(Literal!(@\aftergroup\redcolor@9.0/3@\aftergroup\blackcolor@).valu
 \end{frame}
 
 
+\begin{frame}[fragile]{Placing some limitations}
+\begin{lstlisting}
+// disallow explicit instantiation
+template struct _float<-4.2>;         // definition
+extern template struct _float<-4.2>;  // declaration
+\end{lstlisting}
+
+~
+
+\begin{lstlisting}
+// disallow Nan, Inf
+auto v = _float<-4.2 / 0>{};
+\end{lstlisting}
+\end{frame}
+
+
 \begin{frame}[fragile]{Is there a workaround?}
   \begin{itemize}
   \item Yes, \vspace{5mm}
@@ -228,7 +253,7 @@ static assert(Literal!(@\aftergroup\redcolor@9.0/3@\aftergroup\blackcolor@).valu
 
 \begin{frame}[fragile]{``\texttt{\_float}'' type}
 \begin{lstlisting}
-// only fixed-point here...
+// exponent ignored...
 template<auto H, auto L, auto E>
 struct _float
 {
@@ -351,6 +376,57 @@ struct make_float<H, L, E, I, N, CL<C, Cs...> >
   \item Far easier to iteratively get something working \vspace{5mm}
   \item Perhaps rewrite once parser is completed \vspace{5mm}
   \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Terminal (v2)}
+\begin{lstlisting}
+// still have a terminal function
+template<auto H, auto L, auto E,
+         auto I, auto N,
+         template<char...> class CL>
+auto constexpr make_float_fn(CL<> cl)
+{
+  return _float<H, L, (N - E)>{};
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Decimal offset and digits (v2)}
+\begin{lstlisting}
+// return type deduced...
+template<auto H, auto L, auto E,
+         auto I, auto N,
+         template<char,char...> class CL, char C, char... Cs>
+@\aftergroup\bluecolor@auto@\aftergroup\blackcolor@ constexpr make_float_fn(CL<C, Cs...> cl)
+{
+  @\aftergroup\redcolor@if constexpr@\aftergroup\blackcolor@ (C == '.')
+  {
+    auto constexpr _E = I + 1;
+    @\aftergroup\bluecolor@return@\aftergroup\blackcolor@ make_float_fn<H, L, _E, (I+1), N>(CL<Cs...>{});
+  }
+  else
+  {
+    auto constexpr _D = (C >= '0' && C <= '9');
+    auto constexpr _H = (_D && E == 0)? 10*H+(C-'0'): H;
+    auto constexpr _L = (_D && E  > 0)? 10*L+(C-'0'): L;
+    @\aftergroup\bluecolor@return@\aftergroup\blackcolor@ make_float_fn<_H, L, E, (I+1), N>(CL<Cs...>{});
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Standard library function?}
+\begin{lstlisting}
+// c-t string to float
+using fp = @\aftergroup\redcolor@ct_stof@\aftergroup\blackcolor@<Cs...>;
+
+using s = fp::significand;
+using e = fp::expoonent;
+\end{lstlisting}
 \end{frame}
 
 
