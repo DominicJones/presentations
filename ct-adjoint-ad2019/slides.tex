@@ -18,8 +18,8 @@
 \usepackage{amsmath, amsthm, amssymb}
 \usepackage{listings}
 \usepackage{pxfonts}
-\usepackage{caption}
-
+%% \usepackage{caption}
+\usepackage[labelformat=empty]{caption}
 
 %% \usepackage{xcolor}
 %% \usepackage{newunicodechar}
@@ -178,6 +178,15 @@ struct front<L<@\aftergroup\bluecolor@T1@\aftergroup\blackcolor@, T...> >
       \end{figure}
     \end{column}%
   \end{columns}
+\end{frame}
+
+
+\begin{frame}[plain]
+      \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.99\textwidth]{jag_surf_opt}
+        \caption{Compressible N-S adjoint: automatic at loop iteration level}
+      \end{figure}
 \end{frame}
 
 
@@ -421,7 +430,8 @@ Generate tree with operator overloading
 
 ~
 
-Group hierarchically, prune, then flatten
+Group hierarchically and prune duplicates (at each binary node),\newline
+then flatten (at the root node)
 \begin{lstlisting}
  {@\aftergroup\redcolor@A@\aftergroup\blackcolor@,
   @\aftergroup\redcolor@B@\aftergroup\blackcolor@,
@@ -445,7 +455,7 @@ Map {\color{blue}\texttt{C0}} and {\color{blue}\texttt{C1}} to values
 \end{lstlisting}
 %%
 \begin{lstlisting}
-  array<float, 2> @\aftergroup\bluecolor@vars@\aftergroup\blackcolor@ = {7.0, 9.0};
+  tuple<float, float> @\aftergroup\bluecolor@vars@\aftergroup\blackcolor@ = {7.0, 9.0};
 \end{lstlisting}
 
 ~
@@ -492,7 +502,7 @@ Map {\color{red}\texttt{A}} and {\color{red}\texttt{A}} to addresses
 \end{lstlisting}
 %%
 \begin{lstlisting}
-  array<float *, 2> @\aftergroup\redcolor@args@\aftergroup\blackcolor@ = {&@\aftergroup\redcolor@a@\aftergroup\blackcolor@, &@\aftergroup\redcolor@b@\aftergroup\blackcolor@};
+  tuple<float*, float*> @\aftergroup\redcolor@args@\aftergroup\blackcolor@ = {&@\aftergroup\redcolor@a@\aftergroup\blackcolor@, &@\aftergroup\redcolor@b@\aftergroup\blackcolor@};
 \end{lstlisting}
 
 
@@ -515,11 +525,11 @@ Map offsets of right child nodes
 \begin{frame}[fragile]{Evaluate operator list}
 %%
 \begin{lstlisting}
-  array<float, 2> @\aftergroup\bluecolor@vars@\aftergroup\blackcolor@   = {7.0, 9.0};
+  tuple<float, float> @\aftergroup\bluecolor@vars@\aftergroup\blackcolor@   = {7.0, 9.0};
 \end{lstlisting}
 %%
 \begin{lstlisting}
-  array<float *, 2> @\aftergroup\redcolor@args@\aftergroup\blackcolor@ = {&@\aftergroup\redcolor@a@\aftergroup\blackcolor@, &@\aftergroup\redcolor@b@\aftergroup\blackcolor@};
+  tuple<float*, float*> @\aftergroup\redcolor@args@\aftergroup\blackcolor@ = {&@\aftergroup\redcolor@a@\aftergroup\blackcolor@, &@\aftergroup\redcolor@b@\aftergroup\blackcolor@};
 \end{lstlisting}
 
 ~
@@ -575,11 +585,12 @@ Version & compilation & original & auto diff & manual diff \\
 
 \begin{frame}[fragile]{Conclusion}
   \begin{enumerate}
-  \item Manipulation the tree is obtained at immense effort \vspace{5mm}
+  \item Manipulation the tree is obtained at immense effort \vspace{3mm}
   \item Works in the range of exceptionally well (better than hand coded) to acceptably well (better than alternatives) \vspace{5mm}
-  \item Compile-time features of the language are too limited to use this approach neatly \vspace{5mm}
-  \item Inlining gives up too readily: \verb$__attribute__((always_inline))$ used ubiquitously \vspace{5mm}
-  \item Not obvious what is going on with \verb$std::tuple$ \vspace{5mm}
+  \item Compile-time features of the language are too limited to use this approach neatly (cf. preprocessor macros) \vspace{3mm}
+  \item Inlining gives up too readily; \verb$__attribute__((always_inline))$ used ubiquitously \vspace{3mm}
+  \item Only supports having one result \vspace{3mm}
+  \item Not obvious what is going on with \verb$std::tuple$ \vspace{3mm}
   \end{enumerate}
 \end{frame}
 
@@ -673,7 +684,7 @@ template<char...> struct mp_chars {};
 template<char... Cs>
 auto constexpr operator""@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@()
 {
-  return make_float_t<0, 0, 0, 0,
+  return @\aftergroup\redcolor@make_float_t@\aftergroup\blackcolor@<0, 0, 0, 0,
                       sizeof...(Cs), mp_chars<Cs...> >{};
 }
 \end{lstlisting}
@@ -682,66 +693,66 @@ auto constexpr operator""@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@()
 
 \begin{lstlisting}
 // seamless conversion to literals
-auto constexpr v = -4.2@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@;
-float w = 2 * v;
+auto constexpr c0 = -4.2@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@;
+float t0 = 2 * c0;
 \end{lstlisting}
 \end{frame}
 
 
-\begin{frame}[fragile]{Parsing}
-\begin{lstlisting}
+%% \begin{frame}[fragile]{Parsing}
+%% \begin{lstlisting}
 
-  123.45@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@
+%%   123.45@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@
 
-  // represented as
-  mp_chars<'1', '2', '3', '.', '4', '5'>
+%%   // represented as
+%%   mp_chars<'1', '2', '3', '.', '4', '5'>
 
-  H = '1', '2', '3'  // high chars
-  L = '4', '5'       // low chars
-  E = 4              // decimal offset
-  N = 6              // length
+%%   H = '1', '2', '3'  // high chars
+%%   L = '4', '5'       // low chars
+%%   E = 4              // decimal offset
+%%   N = 6              // length
 
-\end{lstlisting}
-\end{frame}
-
-
-\begin{frame}[fragile]{Terminal}
-\begin{lstlisting}
-// still have a terminal function
-template<auto H, auto L, auto E,
-         auto I, auto N,
-         template<char...> class CL>
-auto constexpr make_float_fn(CL<> cl)
-{
-  return _float<H, L, (N - E)>{};
-}
-\end{lstlisting}
-\end{frame}
+%% \end{lstlisting}
+%% \end{frame}
 
 
-\begin{frame}[fragile]{Decimal offset and digits}
-\begin{lstlisting}
-// return type deduced...
-template<auto H, auto L, auto E,
-         auto I, auto N,
-         template<char,char...> class CL, char C, char... Cs>
-@\aftergroup\bluecolor@auto@\aftergroup\blackcolor@ constexpr make_float_fn(CL<C, Cs...> cl)
-{
-  @\aftergroup\redcolor@if constexpr@\aftergroup\blackcolor@ (C == '.')
-  {
-    auto constexpr _E = I + 1;
-    @\aftergroup\bluecolor@return@\aftergroup\blackcolor@ make_float_fn<H, L, _E, (I+1), N>(CL<Cs...>{});
-  }
-  else
-  {
-    auto constexpr _D = (C >= '0' && C <= '9');
-    auto constexpr _H = (_D && E == 0)? 10*H+(C-'0'): H;
-    auto constexpr _L = (_D && E  > 0)? 10*L+(C-'0'): L;
-    @\aftergroup\bluecolor@return@\aftergroup\blackcolor@ make_float_fn<_H, L, E, (I+1), N>(CL<Cs...>{});
-  }
-}
-\end{lstlisting}
-\end{frame}
+%% \begin{frame}[fragile]{Terminal}
+%% \begin{lstlisting}
+%% // still have a terminal function
+%% template<auto H, auto L, auto E,
+%%          auto I, auto N,
+%%          template<char...> class CL>
+%% auto constexpr make_float_fn(CL<> cl)
+%% {
+%%   return _float<H, L, (N - E)>{};
+%% }
+%% \end{lstlisting}
+%% \end{frame}
+
+
+%% \begin{frame}[fragile]{Decimal offset and digits}
+%% \begin{lstlisting}
+%% // return type deduced...
+%% template<auto H, auto L, auto E,
+%%          auto I, auto N,
+%%          template<char,char...> class CL, char C, char... Cs>
+%% @\aftergroup\bluecolor@auto@\aftergroup\blackcolor@ constexpr make_float_fn(CL<C, Cs...> cl)
+%% {
+%%   @\aftergroup\redcolor@if constexpr@\aftergroup\blackcolor@ (C == '.')
+%%   {
+%%     auto constexpr _E = I + 1;
+%%     @\aftergroup\bluecolor@return@\aftergroup\blackcolor@ make_float_fn<H, L, _E, (I+1), N>(CL<Cs...>{});
+%%   }
+%%   else
+%%   {
+%%     auto constexpr _D = (C >= '0' && C <= '9');
+%%     auto constexpr _H = (_D && E == 0)? 10*H+(C-'0'): H;
+%%     auto constexpr _L = (_D && E  > 0)? 10*L+(C-'0'): L;
+%%     @\aftergroup\bluecolor@return@\aftergroup\blackcolor@ make_float_fn<_H, L, E, (I+1), N>(CL<Cs...>{});
+%%   }
+%% }
+%% \end{lstlisting}
+%% \end{frame}
 
 
 %%
@@ -749,15 +760,34 @@ template<auto H, auto L, auto E,
 %%
 
 
-\begin{frame}[fragile]{Same type, different name}
+\begin{frame}[fragile]{The trusty preprocessor}
+\begin{lstlisting}
+auto fn(A const &@\aftergroup\redcolor@a@\aftergroup\blackcolor@, B const &@\aftergroup\redcolor@b@\aftergroup\blackcolor@)
+{
+  auto @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@7@\aftergroup\greencolor@)@\aftergroup\blackcolor@; // auto = Unique<724, float>{7}
+  auto @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@9@\aftergroup\greencolor@)@\aftergroup\blackcolor@; // auto = Unique<725, float>{9}
+
+  auto t0 = @\aftergroup\redcolor@a@\aftergroup\blackcolor@ * @\aftergroup\redcolor@b@\aftergroup\blackcolor@;
+  auto t1 = @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ + t0;
+  auto t2 = @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ + t0;
+  return t1 / t2;
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{A fundamental problem}
 Write a \texttt{transform} function to yield:\vspace{10mm}
 \begin{lstlisting}
-  transform(@\aftergroup\bluecolor@a + a@\aftergroup\blackcolor@) -> @\aftergroup\redcolor@2 * a@\aftergroup\blackcolor@
+  auto @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = 7;
+  auto @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = 9;
 
-
-  transform(@\aftergroup\bluecolor@a + b@\aftergroup\blackcolor@) -> @\aftergroup\bluecolor@a + b@\aftergroup\blackcolor@
+  transform(@\aftergroup\bluecolor@c0 + c0@\aftergroup\blackcolor@)  -->   @\aftergroup\redcolor@2 * c0@\aftergroup\blackcolor@
+  transform(@\aftergroup\bluecolor@c1 + c0@\aftergroup\blackcolor@)  -->  @\aftergroup\bluecolor@c1 + c0@\aftergroup\blackcolor@
 \end{lstlisting}
-\vspace{10mm}where {\color{blue}\texttt{a}} and {\color{blue}\texttt{b}} are of the \emph{same type}
+\vspace{10mm}
+\emph{Impossible!}
+\ldots despite it appearing so trivial
 \end{frame}
 
 
@@ -787,27 +817,19 @@ struct Terminal(T, string file = @\aftergroup\bluecolor@__FILE__@\aftergroup\bla
 {
   T value;
 
-  auto opBinary(string op, R)(const ref R r)
-  {
-     return Binary!(op, typeof(this), R)(this, r);
-  }
+  ...
 }
-\end{lstlisting}
-
-\begin{lstlisting}
-struct Binary(string op, L, R) {  L l;  R r; }
 \end{lstlisting}
 
 ~
 
 \begin{lstlisting}
-Terminal!double c0; // Terminal!(double, "main.d", 19)
-Terminal!double c1; // Terminal!(double, "main.d", 20)
-pragma(msg, typeof(c0 + c1)); // Binary!("+", C0, C1)
+Terminal!double @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = 7; // Terminal<double, "main.d", 724>
+Terminal!double @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = 9; // Terminal<double, "main.d", 725>
 \end{lstlisting}
 
-\vspace{5mm}
-\footnotesize{\texttt{github.com/DominicJones/snippets/blob/master/D/tagged\_terminal.d}}
+\vspace{10mm}
+{One definition per line could be run-time checked with a debug build which requires all \texttt{Terminal}s be singletons.}
 \end{frame}
 
 
