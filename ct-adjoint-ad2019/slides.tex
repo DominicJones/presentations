@@ -185,7 +185,7 @@ struct front<L<@\aftergroup\bluecolor@T1@\aftergroup\blackcolor@, T...> >
       \begin{figure}[H]
         \centering
         \includegraphics[width=0.99\textwidth]{jag_surf_opt}
-        \caption{Compressible N-S adjoint: automatic at loop iteration level}
+        \caption{Compressible N-S adjoint: auto. diff. at field loop iteration level}
       \end{figure}
 \end{frame}
 
@@ -491,7 +491,7 @@ Map elements in `\texttt{L}' to storage offsets \emph{(2 = null marker)}
 
 
 \begin{frame}[fragile]{Mapping nodes to data}
-Map {\color{red}\texttt{A}} and {\color{red}\texttt{A}} to addresses
+Map {\color{red}\texttt{A}} and {\color{red}\texttt{B}} to addresses
 \begin{lstlisting}
   L = {@\aftergroup\redcolor@A@\aftergroup\blackcolor@,                                //  0  <--
        @\aftergroup\redcolor@B@\aftergroup\blackcolor@,                                //  1  <--
@@ -525,7 +525,7 @@ Map offsets of right child nodes
 \begin{frame}[fragile]{Evaluate operator list}
 %%
 \begin{lstlisting}
-  tuple<float, float> @\aftergroup\bluecolor@vars@\aftergroup\blackcolor@   = {7.0, 9.0};
+  tuple<float, float>   @\aftergroup\bluecolor@vars@\aftergroup\blackcolor@ = {7.0, 9.0};
 \end{lstlisting}
 %%
 \begin{lstlisting}
@@ -534,8 +534,9 @@ Map offsets of right child nodes
 
 ~
 
+Iterate over lists to compute primal and adjoint
 \begin{lstlisting}
-  @\aftergroup\bluecolor@DC@\aftergroup\blackcolor@   = {2, 2, 2, @\aftergroup\bluecolor@0@\aftergroup\blackcolor@, @\aftergroup\bluecolor@1@\aftergroup\blackcolor@, 2}
+  @\aftergroup\blackcolor@DC@\aftergroup\blackcolor@   = {2, 2, 2, @\aftergroup\bluecolor@0@\aftergroup\blackcolor@, @\aftergroup\bluecolor@1@\aftergroup\blackcolor@, 2}
 \end{lstlisting}
 %%
 \begin{lstlisting}
@@ -546,9 +547,6 @@ Map offsets of right child nodes
   IL_R = {6, 6, @\aftergroup\redcolor@1@\aftergroup\blackcolor@, 2, 2, 4}
 \end{lstlisting}
 
-~
-
-Iterate list to compute primal and adjoint
 \begin{lstlisting}
   L = {@\aftergroup\redcolor@A@\aftergroup\blackcolor@,                                //  0
        @\aftergroup\redcolor@B@\aftergroup\blackcolor@,                                //  1
@@ -586,7 +584,9 @@ Version & compilation & original & auto diff & manual diff \\
 \begin{frame}[fragile]{Conclusion}
   \begin{enumerate}
   \item Manipulation the tree is obtained at immense effort \vspace{3mm}
-  \item Works in the range of exceptionally well (better than hand coded) to acceptably well (better than alternatives) \vspace{5mm}
+  \item Works in the range of acceptably well (better than most alternatives) to exceptionally well (better than hand coded) \vspace{3mm}
+  \item Prunes global tree (computation optimisation) \vspace{3mm}
+  \item Orders data by access (cache optimisation) \vspace{3mm}
   \item Compile-time features of the language are too limited to use this approach neatly (cf. preprocessor macros) \vspace{3mm}
   \item Inlining gives up too readily; \verb$__attribute__((always_inline))$ used ubiquitously \vspace{3mm}
   \item Only supports having one result \vspace{3mm}
@@ -806,7 +806,7 @@ Write a \texttt{transform} function to yield:\vspace{10mm}
      type                address@\aftergroup\graycolor@
   \end{lstlisting}
  \vspace{10mm}
-Reflect \emph{location} of {\color{blue}\texttt{x}}, at {\color{red}\texttt{[7, 4, main.cpp]}}?
+Reflect \emph{location} of {\color{blue}\texttt{x}}, at {\color{red}\texttt{[18, 4, main.cpp]}}?
 \end{frame}
 
 
@@ -824,8 +824,8 @@ struct Terminal(T, string file = @\aftergroup\bluecolor@__FILE__@\aftergroup\bla
 ~
 
 \begin{lstlisting}
-Terminal!double @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = 7; // Terminal<double, "main.d", 724>
-Terminal!double @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = 9; // Terminal<double, "main.d", 725>
+Terminal!float @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = 7; // Terminal!(float, "main.d", 724)
+Terminal!float @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = 9; // Terminal!(float, "main.d", 725)
 \end{lstlisting}
 
 \vspace{10mm}
