@@ -202,12 +202,12 @@ struct front<L<@\aftergroup\bluecolor@T1@\aftergroup\blackcolor@, T...> >
 fn(A const &a, B const &b,
    R &r)
 {
-  auto c0 = 7;
-  auto c1 = 9;
+  auto p0 = 7;
+  auto p1 = 9;
 
   auto t0 = a * b;   // 1
-  auto t1 = c0 + t0; // 2
-  auto t2 = c1 + t0; // 3
+  auto t1 = p0 + t0; // 2
+  auto t2 = p1 + t0; // 3
 
   r  = t1 / t2;      // 4
 }
@@ -220,12 +220,12 @@ fn(A const &a, B const &b,
 fn(A const &a, B const &b,
    R &r)
 {
-  auto c0 = 7;
-  auto c1 = 9;
+  auto p0 = 7;
+  auto p1 = 9;
 
   auto t0 = a * b;   // 1
-  auto t1 = c0 + t0; // 2
-  auto t2 = c1 + t0; // 3
+  auto t1 = p0 + t0; // 2
+  auto t2 = p1 + t0; // 3
 
   // somehow add this...
   t1.d += (1/t2)    * r.d; // 4'
@@ -262,12 +262,12 @@ Eager evaluation and capture by reference?
 fn(A const &a, B const &b,
    R &r)
 {
-  auto c0 = 7;
-  auto c1 = 9;
+  auto p0 = 7;
+  auto p1 = 9;
 
   auto @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@ = a * b;
-  auto t1 = c0 + @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@;
-  auto t2 = c1 + @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@;
+  auto t1 = p0 + @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@;
+  auto t2 = p1 + @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@;
 
   r  = t1 / t2;
 }
@@ -296,12 +296,12 @@ The \emph{complete} tree, including {\color{red}\texttt{cm}}, is needed for the 
 
 fn(A const &a, B const &b, R &r)
 {
-  auto c0 = 7;
-  auto c1 = 9;
+  auto p0 = 7;
+  auto p1 = 9;
 
   auto t0 = @\aftergroup\bluecolor@mul_dbl(a, b)@\aftergroup\blackcolor@;
-  auto t1 = c0 + t0;
-  auto t2 = c1 + t0;
+  auto t1 = p0 + t0;
+  auto t2 = p1 + t0;
 
   r  = t1 / t2;
 }
@@ -317,12 +317,12 @@ The \emph{complete} tree, including {\color{red}\texttt{cm}}, is needed for the 
 fn(A const &a, B const &b,
    R &r)
 {
-  auto c0 = 7;
-  auto c1 = 9;
+  auto p0 = 7;
+  auto p1 = 9;
   auto @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ = 2;
   auto t0 = @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a * b;
-  auto t1 = c0 + t0;
-  auto t2 = c1 + t0;
+  auto t1 = p0 + t0;
+  auto t2 = p1 + t0;
 
   r  = t1 / t2;
 }
@@ -334,12 +334,12 @@ fn(A const &a, B const &b,
 fn(A const &a, B const &b,
    R &r)
 {
-  auto c0 = 7;
-  auto c1 = 9;
+  auto p0 = 7;
+  auto p1 = 9;
   auto @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ = 2;
   auto t0 = @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a * b;
-  auto t1 = c0 + t0;
-  auto t2 = c1 + t0;
+  auto t1 = p0 + t0;
+  auto t2 = p1 + t0;
 
   // the transform...
   t1.d += (1/t2)    * r.d;
@@ -371,14 +371,14 @@ fn(A const &a, B const &b,
 
 \begin{frame}[fragile]{Two kinds of data}
 \begin{lstlisting}
-auto fn(A const &@\aftergroup\redcolor@a@\aftergroup\blackcolor@, B const &@\aftergroup\redcolor@b@\aftergroup\blackcolor@)
+auto fn(A const &@\aftergroup\redcolor@a0@\aftergroup\blackcolor@, B const &@\aftergroup\redcolor@a1@\aftergroup\blackcolor@)
 {
-  auto @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@7@\aftergroup\greencolor@)@\aftergroup\blackcolor@;
-  auto @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@9@\aftergroup\greencolor@)@\aftergroup\blackcolor@;
+  auto @\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@7@\aftergroup\greencolor@)@\aftergroup\blackcolor@;
+  auto @\aftergroup\bluecolor@p1@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@9@\aftergroup\greencolor@)@\aftergroup\blackcolor@;
 
-  auto t0 = @\aftergroup\redcolor@a@\aftergroup\blackcolor@ * @\aftergroup\redcolor@b@\aftergroup\blackcolor@;
-  auto t1 = @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ + t0;
-  auto t2 = @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ + t0;
+  auto t0 = @\aftergroup\redcolor@a0@\aftergroup\blackcolor@ * @\aftergroup\redcolor@a1@\aftergroup\blackcolor@;
+  auto t1 = @\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ + t0;
+  auto t2 = @\aftergroup\bluecolor@p1@\aftergroup\blackcolor@ + t0;
   return t1 / t2;
 }
 \end{lstlisting}
@@ -422,10 +422,10 @@ struct Unique
 Generate tree with operator overloading
 \begin{lstlisting}
   Binary<Div,
-    Binary<Add, @\aftergroup\bluecolor@C0@\aftergroup\blackcolor@,
-      Binary<Mul, @\aftergroup\redcolor@A@\aftergroup\blackcolor@, @\aftergroup\redcolor@B@\aftergroup\blackcolor@> >
-    Binary<Add, @\aftergroup\bluecolor@C1@\aftergroup\blackcolor@,
-      Binary<Mul, @\aftergroup\redcolor@A@\aftergroup\blackcolor@, @\aftergroup\redcolor@B@\aftergroup\blackcolor@> > >
+    Binary<Add, @\aftergroup\bluecolor@P0@\aftergroup\blackcolor@,
+      Binary<Mul, @\aftergroup\redcolor@A0@\aftergroup\blackcolor@, @\aftergroup\redcolor@A1@\aftergroup\blackcolor@> >
+    Binary<Add, @\aftergroup\bluecolor@P1@\aftergroup\blackcolor@,
+      Binary<Mul, @\aftergroup\redcolor@A0@\aftergroup\blackcolor@, @\aftergroup\redcolor@A1@\aftergroup\blackcolor@> > >
 \end{lstlisting}
 
 ~
@@ -433,34 +433,34 @@ Generate tree with operator overloading
 Group hierarchically and prune duplicates (at each binary node),\newline
 then flatten (at the root node)
 \begin{lstlisting}
- {@\aftergroup\redcolor@A@\aftergroup\blackcolor@,
-  @\aftergroup\redcolor@B@\aftergroup\blackcolor@,
-  Binary<Mul, @\aftergroup\redcolor@A@\aftergroup\blackcolor@, @\aftergroup\redcolor@B@\aftergroup\blackcolor@>,
-  Binary<Add, @\aftergroup\bluecolor@C0@\aftergroup\blackcolor@, [...]>,
-  Binary<Add, @\aftergroup\bluecolor@C1@\aftergroup\blackcolor@, [...]>,
+ {@\aftergroup\redcolor@A0@\aftergroup\blackcolor@,
+  @\aftergroup\redcolor@A1@\aftergroup\blackcolor@,
+  Binary<Mul, @\aftergroup\redcolor@A0@\aftergroup\blackcolor@, @\aftergroup\redcolor@A1@\aftergroup\blackcolor@>,
+  Binary<Add, @\aftergroup\bluecolor@P0@\aftergroup\blackcolor@, [...]>,
+  Binary<Add, @\aftergroup\bluecolor@P1@\aftergroup\blackcolor@, [...]>,
   Binary<Div, [...], [...]>}
 \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]{Mapping nodes to data}
-Map {\color{blue}\texttt{C0}} and {\color{blue}\texttt{C1}} to values
+Map {\color{blue}\texttt{P0}} and {\color{blue}\texttt{P1}} to values (passive terminals)
 \begin{lstlisting}
-  L = {@\aftergroup\redcolor@A@\aftergroup\blackcolor@,                                //  0
-       @\aftergroup\redcolor@B@\aftergroup\blackcolor@,                                //  1
-       Binary<Mul, @\aftergroup\redcolor@A@\aftergroup\blackcolor@, @\aftergroup\redcolor@B@\aftergroup\blackcolor@>,                //  2
-       Binary<Add, @\aftergroup\bluecolor@C0@\aftergroup\blackcolor@, [...]>,           //  3  <--
-       Binary<Add, @\aftergroup\bluecolor@C1@\aftergroup\blackcolor@, [...]>,           //  4  <--
+  L = {@\aftergroup\redcolor@A0@\aftergroup\blackcolor@,                               //  0
+       @\aftergroup\redcolor@A1@\aftergroup\blackcolor@,                               //  1
+       Binary<Mul, @\aftergroup\redcolor@A0@\aftergroup\blackcolor@, @\aftergroup\redcolor@A1@\aftergroup\blackcolor@>,              //  2
+       Binary<Add, @\aftergroup\bluecolor@P0@\aftergroup\blackcolor@, [...]>,           //  3  <--
+       Binary<Add, @\aftergroup\bluecolor@P1@\aftergroup\blackcolor@, [...]>,           //  4  <--
        Binary<Div, [...], [...]>}        //  5
 \end{lstlisting}
 %%
 \begin{lstlisting}
-  tuple<float, float> @\aftergroup\bluecolor@vars@\aftergroup\blackcolor@ = {7.0, 9.0};
+  tuple<float, float> @\aftergroup\bluecolor@p_vars@\aftergroup\blackcolor@ = {7.0, 9.0};
 \end{lstlisting}
 
 ~
 
-Indices of constants in `\texttt{L}'
+Indices of passive terminals in `\texttt{L}'
 \begin{lstlisting}
   @\aftergroup\bluecolor@IC@\aftergroup\blackcolor@ = {3, 4}
 \end{lstlisting}
@@ -491,18 +491,18 @@ Map elements in `\texttt{L}' to storage offsets \emph{(2 = null marker)}
 
 
 \begin{frame}[fragile]{Mapping nodes to data}
-Map {\color{red}\texttt{A}} and {\color{red}\texttt{B}} to addresses
+Map {\color{red}\texttt{A0}} and {\color{red}\texttt{A1}} to addresses (active terminals)
 \begin{lstlisting}
-  L = {@\aftergroup\redcolor@A@\aftergroup\blackcolor@,                                //  0  <--
-       @\aftergroup\redcolor@B@\aftergroup\blackcolor@,                                //  1  <--
-       Binary<Mul, @\aftergroup\redcolor@A@\aftergroup\blackcolor@, @\aftergroup\redcolor@B@\aftergroup\blackcolor@>,                //  2
-       Binary<Add, @\aftergroup\bluecolor@C0@\aftergroup\blackcolor@, [...]>,           //  3
-       Binary<Add, @\aftergroup\bluecolor@C1@\aftergroup\blackcolor@, [...]>,           //  4
+  L = {@\aftergroup\redcolor@A0@\aftergroup\blackcolor@,                               //  0  <--
+       @\aftergroup\redcolor@A1@\aftergroup\blackcolor@,                               //  1  <--
+       Binary<Mul, @\aftergroup\redcolor@A0@\aftergroup\blackcolor@, @\aftergroup\redcolor@A1@\aftergroup\blackcolor@>,              //  2
+       Binary<Add, @\aftergroup\bluecolor@P0@\aftergroup\blackcolor@, [...]>,           //  3
+       Binary<Add, @\aftergroup\bluecolor@P1@\aftergroup\blackcolor@, [...]>,           //  4
        Binary<Div, [...], [...]>}        //  5
 \end{lstlisting}
 %%
 \begin{lstlisting}
-  tuple<float*, float*> @\aftergroup\redcolor@args@\aftergroup\blackcolor@ = {&@\aftergroup\redcolor@a@\aftergroup\blackcolor@, &@\aftergroup\redcolor@b@\aftergroup\blackcolor@};
+  tuple<float*, float*> @\aftergroup\redcolor@a_vars@\aftergroup\blackcolor@ = {&@\aftergroup\redcolor@a0@\aftergroup\blackcolor@, &@\aftergroup\redcolor@a1@\aftergroup\blackcolor@};
 \end{lstlisting}
 
 
@@ -525,11 +525,11 @@ Map offsets of right child nodes
 \begin{frame}[fragile]{Evaluate operator list}
 %%
 \begin{lstlisting}
-  tuple<float, float>   @\aftergroup\bluecolor@vars@\aftergroup\blackcolor@ = {7.0, 9.0};
+  tuple<float, float>   @\aftergroup\bluecolor@p_vars@\aftergroup\blackcolor@ = {7.0, 9.0};
 \end{lstlisting}
 %%
 \begin{lstlisting}
-  tuple<float*, float*> @\aftergroup\redcolor@args@\aftergroup\blackcolor@ = {&@\aftergroup\redcolor@a@\aftergroup\blackcolor@, &@\aftergroup\redcolor@b@\aftergroup\blackcolor@};
+  tuple<float*, float*> @\aftergroup\redcolor@a_vars@\aftergroup\blackcolor@ = {&@\aftergroup\redcolor@a0@\aftergroup\blackcolor@, &@\aftergroup\redcolor@a1@\aftergroup\blackcolor@};
 \end{lstlisting}
 
 ~
@@ -548,18 +548,18 @@ Iterate over lists to compute primal and adjoint
 \end{lstlisting}
 
 \begin{lstlisting}
-  L = {@\aftergroup\redcolor@A@\aftergroup\blackcolor@,                                //  0
-       @\aftergroup\redcolor@B@\aftergroup\blackcolor@,                                //  1
-       Binary<Mul, @\aftergroup\redcolor@A@\aftergroup\blackcolor@, @\aftergroup\redcolor@B@\aftergroup\blackcolor@>,                //  2
-       Binary<Add, @\aftergroup\bluecolor@C0@\aftergroup\blackcolor@, [...]>,           //  3
-       Binary<Add, @\aftergroup\bluecolor@C1@\aftergroup\blackcolor@, [...]>,           //  4
+  L = {@\aftergroup\redcolor@A0@\aftergroup\blackcolor@,                               //  0
+       @\aftergroup\redcolor@A1@\aftergroup\blackcolor@,                               //  1
+       Binary<Mul, @\aftergroup\redcolor@A0@\aftergroup\blackcolor@, @\aftergroup\redcolor@A1@\aftergroup\blackcolor@>,              //  2
+       Binary<Add, @\aftergroup\bluecolor@P0@\aftergroup\blackcolor@, [...]>,           //  3
+       Binary<Add, @\aftergroup\bluecolor@P1@\aftergroup\blackcolor@, [...]>,           //  4
        Binary<Div, [...], [...]>}        //  5
 \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]{Results}
-\textbf{Case 1}: nodes: 82, depth: 37, inputs: 2, constants: 12
+\textbf{Case 1}: nodes: 82, depth: 37, inputs: 2, passive values: 12
 \begin{table}
 \begin{tabular}{l | c | c | c | c }
 Version & compilation & original & auto diff & manual diff \\
@@ -568,8 +568,10 @@ Version & compilation & original & auto diff & manual diff \\
 \texttt{std::tuple} & 4.5s & 1x & 1.25x & 1.48x \\
 \end{tabular}
 \end{table}
-\vspace{10mm}
-\textbf{Case 2}: nodes: 331, depth: 25, inputs: 5, constants: 103
+\-\hspace{5mm} Duplicate subtree expressions identified and removed
+\vspace{5mm}
+
+\textbf{Case 2}: nodes: 331, depth: 25, inputs: 5, passive values: 103
 \begin{table}
 \begin{tabular}{l | c | c | c | c }
 Version & compilation & original & auto diff & manual diff \\
@@ -578,19 +580,19 @@ Version & compilation & original & auto diff & manual diff \\
 \texttt{std::tuple} & 27m & 1x & 4.7x & 1.9x \\
 \end{tabular}
 \end{table}
+\-\hspace{5mm} Inlining of \texttt{Binary} ctor's hindered by size of \texttt{p\_vars} tuple
 \end{frame}
 
 
 \begin{frame}[fragile]{Conclusion}
   \begin{enumerate}
-  \item Manipulation the tree is obtained at immense effort \vspace{3mm}
-  \item Works in the range of acceptably well (better than most alternatives) to exceptionally well (better than hand coded) \vspace{3mm}
-  \item Prunes global tree (computation optimisation) \vspace{3mm}
-  \item Orders data by access (cache optimisation) \vspace{3mm}
-  \item Compile-time features of the language are too limited to use this approach neatly (cf. preprocessor macros) \vspace{3mm}
-  \item Inlining gives up too readily; \verb$__attribute__((always_inline))$ used ubiquitously \vspace{3mm}
-  \item Only supports having one result \vspace{3mm}
-  \item Not obvious what is going on with \verb$std::tuple$ \vspace{3mm}
+  \item Non-terminal nodes not captured at all \vspace{3mm}
+  \item \ldots but only supports having one result. \vspace{3mm}
+  \item Works in the range of acceptably well (better than most alternatives) to exceptionally well (better than hand coded). \vspace{3mm}
+  \item Prunes global tree (computation optimisation); orders data by access (cache optimisation). \vspace{3mm}
+  \item Compile-time features of the language are too limited to use this approach neatly (cf. preprocessor macros). \vspace{3mm}
+  \item Inlining gives up too readily; \verb$__attribute__((always_inline))$ used ubiquitously. \vspace{3mm}
+  \item Not obvious what is going on with \verb$std::tuple$. \vspace{3mm}
   \end{enumerate}
 \end{frame}
 
@@ -599,7 +601,7 @@ Version & compilation & original & auto diff & manual diff \\
 \section{\protect\textit{Float template parameter}}
 %%
 
-\begin{frame}[fragile]{Distinguishing different constants}
+\begin{frame}[fragile]{Type-distinguishing of terminals}
   \begin{columns}[T] % align columns
     %% \begin{column}{0.3\textwidth}
     %% \end{column}%
@@ -628,8 +630,8 @@ struct @\aftergroup\redcolor@_float@\aftergroup\blackcolor@
 
 \begin{lstlisting}
 // type distinguished by value
-auto constexpr @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = -4.2@\aftergroup\redcolor@_f@\aftergroup\blackcolor@;
-static_assert(@\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ == @\aftergroup\redcolor@_float@\aftergroup\blackcolor@<-4.2>{});
+auto constexpr @\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ = -4.2@\aftergroup\redcolor@_f@\aftergroup\blackcolor@;
+static_assert(@\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ == @\aftergroup\redcolor@_float@\aftergroup\blackcolor@<-4.2>{});
 \end{lstlisting}
 \end{frame}
 
@@ -693,8 +695,8 @@ auto constexpr operator""@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@()
 
 \begin{lstlisting}
 // seamless conversion to literals
-auto constexpr c0 = -4.2@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@;
-float t0 = 2 * c0;
+auto constexpr p0 = -4.2@\aftergroup\bluecolor@_f@\aftergroup\blackcolor@;
+float t0 = 2 * p0;
 \end{lstlisting}
 \end{frame}
 
@@ -762,14 +764,14 @@ float t0 = 2 * c0;
 
 \begin{frame}[fragile]{The trusty preprocessor}
 \begin{lstlisting}
-auto fn(A const &@\aftergroup\redcolor@a@\aftergroup\blackcolor@, B const &@\aftergroup\redcolor@b@\aftergroup\blackcolor@)
+auto fn(A const &@\aftergroup\redcolor@a0@\aftergroup\blackcolor@, B const &@\aftergroup\redcolor@a1@\aftergroup\blackcolor@)
 {
-  auto @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@7@\aftergroup\greencolor@)@\aftergroup\blackcolor@; // auto = Unique<724, float>{7}
-  auto @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@9@\aftergroup\greencolor@)@\aftergroup\blackcolor@; // auto = Unique<725, float>{9}
+  auto @\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@7@\aftergroup\greencolor@)@\aftergroup\blackcolor@; // auto = Unique<724, float>{7}
+  auto @\aftergroup\bluecolor@p1@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@9@\aftergroup\greencolor@)@\aftergroup\blackcolor@; // auto = Unique<725, float>{9}
 
-  auto t0 = @\aftergroup\redcolor@a@\aftergroup\blackcolor@ * @\aftergroup\redcolor@b@\aftergroup\blackcolor@;
-  auto t1 = @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ + t0;
-  auto t2 = @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ + t0;
+  auto t0 = @\aftergroup\redcolor@a0@\aftergroup\blackcolor@ * @\aftergroup\redcolor@a1@\aftergroup\blackcolor@;
+  auto t1 = @\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ + t0;
+  auto t2 = @\aftergroup\bluecolor@p1@\aftergroup\blackcolor@ + t0;
   return t1 / t2;
 }
 \end{lstlisting}
@@ -779,11 +781,11 @@ auto fn(A const &@\aftergroup\redcolor@a@\aftergroup\blackcolor@, B const &@\aft
 \begin{frame}[fragile]{A fundamental problem}
 Write a \texttt{transform} function to yield:\vspace{10mm}
 \begin{lstlisting}
-  auto @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = 7;
-  auto @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = 9;
+  auto @\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ = 7;
+  auto @\aftergroup\bluecolor@p1@\aftergroup\blackcolor@ = 9;
 
-  transform(@\aftergroup\bluecolor@c0 + c0@\aftergroup\blackcolor@)  -->   @\aftergroup\redcolor@2 * c0@\aftergroup\blackcolor@
-  transform(@\aftergroup\bluecolor@c1 + c0@\aftergroup\blackcolor@)  -->  @\aftergroup\bluecolor@c1 + c0@\aftergroup\blackcolor@
+  transform(@\aftergroup\bluecolor@p0 + p0@\aftergroup\blackcolor@)  -->   @\aftergroup\redcolor@2 * p0@\aftergroup\blackcolor@
+  transform(@\aftergroup\bluecolor@p1 + p0@\aftergroup\blackcolor@)  -->  @\aftergroup\bluecolor@p1 + p0@\aftergroup\blackcolor@
 \end{lstlisting}
 \vspace{10mm}
 \emph{Impossible!}
@@ -824,8 +826,8 @@ struct Terminal(T, string file = @\aftergroup\bluecolor@__FILE__@\aftergroup\bla
 ~
 
 \begin{lstlisting}
-Terminal!float @\aftergroup\bluecolor@c0@\aftergroup\blackcolor@ = 7; // Terminal!(float, "main.d", 724)
-Terminal!float @\aftergroup\bluecolor@c1@\aftergroup\blackcolor@ = 9; // Terminal!(float, "main.d", 725)
+Terminal!float @\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ = 7; // Terminal!(float, "main.d", 724)
+Terminal!float @\aftergroup\bluecolor@p1@\aftergroup\blackcolor@ = 9; // Terminal!(float, "main.d", 725)
 \end{lstlisting}
 
 \vspace{10mm}
