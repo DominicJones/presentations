@@ -199,13 +199,14 @@ struct front<L<@\aftergroup\bluecolor@T1@\aftergroup\blackcolor@, T...> >
     \begin{column}{0.44\textwidth}
       {\color{gray}{write something like this \dots}}
       \begin{lstlisting}
-fn(A const &a, B const &b,
+fn(A0 const &a0,
+   A1 const &a1,
    R &r)
 {
   auto p0 = 7;
   auto p1 = 9;
 
-  auto t0 = a * b;   // 1
+  auto t0 = a0 * a1; // 1
   auto t1 = p0 + t0; // 2
   auto t2 = p1 + t0; // 3
 
@@ -217,13 +218,13 @@ fn(A const &a, B const &b,
     \begin{column}{0.56\textwidth}
       {\color{gray}{to implement something like this}}
         \begin{lstlisting}
-fn(A const &a, B const &b,
+fn(A0 const &a0, A1 const &a1,
    R &r)
 {
   auto p0 = 7;
   auto p1 = 9;
 
-  auto t0 = a * b;   // 1
+  auto t0 = a0 * a1; // 1
   auto t1 = p0 + t0; // 2
   auto t2 = p1 + t0; // 3
 
@@ -232,8 +233,8 @@ fn(A const &a, B const &b,
   t2.d -= (t1/t2^2) * r.d; // 4'
   t0.d += t2.d;            // 3'
   t0.d += t1.d;            // 2'
-  a.d  += b * t0.d;        // 1'
-  b.d  += a * t0.d;        // 1'
+  a0.d += a1 * t0.d;       // 1'
+  a1.d += a0 * t0.d;       // 1'
 }
   \end{lstlisting}
     \end{column}%
@@ -254,18 +255,19 @@ fn(A const &a, B const &b,
 \section{Two hurdles}
 %%
 
-\begin{frame}[fragile]{1. Dealing with duplicate nodes}
+\begin{frame}[fragile]{1. Dealing with duplicate branches}
 Eager evaluation and capture by reference?
   \begin{columns}[T] % align columns
-    \begin{column}{0.5\textwidth}
+    \begin{column}{0.4\textwidth}
         \begin{lstlisting}
-fn(A const &a, B const &b,
+fn(A0 const &a0,
+   A1 const &a1,
    R &r)
 {
   auto p0 = 7;
   auto p1 = 9;
 
-  auto @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@ = a * b;
+  auto @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@ = a0 * a1;
   auto t1 = p0 + @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@;
   auto t2 = p1 + @\aftergroup\bluecolor@t0@\aftergroup\blackcolor@;
 
@@ -274,7 +276,7 @@ fn(A const &a, B const &b,
   \end{lstlisting}
     \end{column}%
     \hfill%
-    \begin{column}{0.5\textwidth}
+    \begin{column}{0.6\textwidth}
 \begin{figure}[H]
  \centering
  \includegraphics[width=0.99\textwidth]{fig_exprtree_dup}
@@ -288,18 +290,18 @@ fn(A const &a, B const &b,
 The \emph{complete} tree, including {\color{red}\texttt{cm}}, is needed for the transform
 
       \begin{lstlisting}
-@\aftergroup\bluecolor@mul_dbl@\aftergroup\blackcolor@(A const &a, B const &b)
+@\aftergroup\bluecolor@mul_dbl@\aftergroup\blackcolor@(A0 const &a0, A1 const &a1)
 {
   auto @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ = 2; // locally scoped
-  return @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a * b;
+  return @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a0 * a1;
 }
 
-fn(A const &a, B const &b, R &r)
+fn(A0 const &a0, A1 const &a1, R &r)
 {
   auto p0 = 7;
   auto p1 = 9;
 
-  auto t0 = @\aftergroup\bluecolor@mul_dbl(a, b)@\aftergroup\blackcolor@;
+  auto t0 = @\aftergroup\bluecolor@mul_dbl(a0, a1)@\aftergroup\blackcolor@;
   auto t1 = p0 + t0;
   auto t2 = p1 + t0;
 
@@ -314,13 +316,14 @@ The \emph{complete} tree, including {\color{red}\texttt{cm}}, is needed for the 
   \begin{columns}[T] % align columns
     \begin{column}{0.44\textwidth}
       \begin{lstlisting}
-fn(A const &a, B const &b,
+fn(A0 const &a0,
+   A1 const &a1,
    R &r)
 {
   auto p0 = 7;
   auto p1 = 9;
   auto @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ = 2;
-  auto t0 = @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a * b;
+  auto t0 = @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a0 * a1;
   auto t1 = p0 + t0;
   auto t2 = p1 + t0;
 
@@ -331,13 +334,13 @@ fn(A const &a, B const &b,
     \hfill%
     \begin{column}{0.56\textwidth}
         \begin{lstlisting}
-fn(A const &a, B const &b,
+fn(A0 const &a0, A1 const &a1,
    R &r)
 {
   auto p0 = 7;
   auto p1 = 9;
   auto @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ = 2;
-  auto t0 = @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a * b;
+  auto t0 = @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a0 * a1;
   auto t1 = p0 + t0;
   auto t2 = p1 + t0;
 
@@ -346,8 +349,8 @@ fn(A const &a, B const &b,
   t2.d -= (t1/t2^2) * r.d;
   t0.d += t2.d;
   t0.d += t1.d;
-  a.d  += @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * b * t0.d;
-  b.d  += @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a * t0.d;
+  a0.d += @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a1 * t0.d;
+  a1.d += @\aftergroup\redcolor@cm@\aftergroup\blackcolor@ * a0 * t0.d;
 }
   \end{lstlisting}
     \end{column}%
@@ -371,7 +374,7 @@ fn(A const &a, B const &b,
 
 \begin{frame}[fragile]{Two kinds of data}
 \begin{lstlisting}
-auto fn(A const &@\aftergroup\redcolor@a0@\aftergroup\blackcolor@, B const &@\aftergroup\redcolor@a1@\aftergroup\blackcolor@)
+auto fn(A0 const &@\aftergroup\redcolor@a0@\aftergroup\blackcolor@, A1 const &@\aftergroup\redcolor@a1@\aftergroup\blackcolor@)
 {
   auto @\aftergroup\bluecolor@p0@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@7@\aftergroup\greencolor@)@\aftergroup\blackcolor@;
   auto @\aftergroup\bluecolor@p1@\aftergroup\blackcolor@ = @\aftergroup\greencolor@UQ(@\aftergroup\blackcolor@9@\aftergroup\greencolor@)@\aftergroup\blackcolor@;
@@ -534,7 +537,7 @@ Map offsets of right child nodes
 
 ~
 
-Iterate over lists to compute primal and adjoint
+Iterate over lists to compute
 \begin{lstlisting}
   @\aftergroup\blackcolor@DC@\aftergroup\blackcolor@   = {2, 2, 2, @\aftergroup\bluecolor@0@\aftergroup\blackcolor@, @\aftergroup\bluecolor@1@\aftergroup\blackcolor@, 2}
 \end{lstlisting}
@@ -580,7 +583,7 @@ Version & compilation & original & auto diff & manual diff \\
 \texttt{std::tuple} & 27m & 1x & 4.7x & 1.9x \\
 \end{tabular}
 \end{table}
-\-\hspace{5mm} Inlining of \texttt{Binary} ctor's hindered by size of \texttt{p\_vars} tuple
+\-\hspace{5mm} Inlining of \texttt{Binary} ctor's hindered by size of \texttt{p\_vars}
 \end{frame}
 
 
